@@ -16,6 +16,8 @@ def batch_processing(batch_size: int):
     # Print the filtered users
     for result in results:
         print(result)
+    
+    return
 
 
 def stream_users_in_batches(batch_size: int):
