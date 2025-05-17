@@ -7,7 +7,7 @@ from typing import Any
 seed = __import__("seed")
 
 
-def batch_processing(batch_size: int):
+def batch_processing(batch_size):
     """Function to process each batch to filter users over the age of 25"""
     # print(f"Processing users in batches of {batch_size}...")
 
