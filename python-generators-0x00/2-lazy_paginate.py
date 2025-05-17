@@ -18,12 +18,16 @@ def paginate_users(page_size: int, offset: int):
 
 def lazy_paginate(page_size: int):
     """Generator function to paginate through user data."""
-    offset = 0
+    offset: int = 0
     while True:
         rows = paginate_users(page_size, offset)
+        # print(rows)
+
         if not rows:
             break
-        for row in rows:
-            yield row
+        
+        # yield results
+        yield rows
+        
+        # increment offset
         offset += page_size
-        # print(f"Fetched {len(rows)} rows with offset {offset}")
