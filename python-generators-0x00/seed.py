@@ -1,6 +1,6 @@
 """Seed script to populate the database with user data from a CSV file."""
 
-#!/usr/bin/env python3
+#!/usr/bin/python3
 import os
 from typing import Any
 from uuid import UUID, uuid4
