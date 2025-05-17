@@ -1,23 +1,17 @@
 """Batch processing script to create a generator to fetch and process data in batches from the users database"""
 
 # import seed module to connect to the database
-from typing import Any
-
+# from typing import Any
 
 seed = __import__("seed")
 
 
-def batch_processing(batch_size):
+def batch_processing(batch_size: int):
     """Function to process each batch to filter users over the age of 25"""
     # print(f"Processing users in batches of {batch_size}...")
 
-    results: list[Any] = []
-    # Check if the connection was successful
-    for row in list(stream_users_in_batches(batch_size)):
-        # Filter users over the age of 25
-        # print(row)
-        if row[3] > 25:
-            results.append(row)
+    # Convert the for loop to a generator comprehension
+    results = (row for row in stream_users_in_batches(batch_size) if row[3] > 25)
 
     # Print the filtered users
     for result in results:
