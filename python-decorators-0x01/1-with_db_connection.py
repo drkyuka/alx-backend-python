@@ -1,8 +1,8 @@
 """This module provides a decorator to manage SQLite database connections"""
 
-import sqlite3
 import functools
 import logging
+import sqlite3
 from datetime import datetime
 
 #### decorator to lof SQL queries
@@ -24,12 +24,18 @@ def with_db_connection(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         # print(*args)
+        conn = None
         try:
-            conn: sqlite3.Connection = sqlite3.connect(userdb)
+            conn = sqlite3.connect(userdb)
             logging.info("Connection to %s successful", userdb)
 
-            # Pass the connection as the first argument, then all args and kwargs
-            result = func(conn, *args, **kwargs)
+            # Check if the first parameter is already a connection (from another decorator)
+            if args and isinstance(args[0], sqlite3.Connection):
+                result = func(*args, **kwargs)
+            else:
+                # Pass the connection as the first argument, then all args and kwargs
+                result = func(conn, *args, **kwargs)
+
             logging.info("Query successful: %s", result)
             return result
         except sqlite3.Error as e:

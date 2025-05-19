@@ -65,3 +65,33 @@
 2025-05-19 11:11 - INFO - Query successful: None
 2025-05-19 11:11 - INFO - Connection to users.db successful
 2025-05-19 11:11 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:01 - INFO - Connection to users.db successful
+2025-05-19 12:01 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:02 - INFO - Connection to users.db successful
+2025-05-19 12:02 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:03 - INFO - Connection to users.db successful
+2025-05-19 12:03 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:08 - INFO - Connection to users.db successful
+2025-05-19 12:08 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:08 - INFO - Attempt 1 of 3
+2025-05-19 12:08 - INFO - Connection to users.db successful
+2025-05-19 12:08 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48'), (3, 'Alice', 'Johnson', 'alicejohnson', 'alicejohnson@example.net', '2025-05-19 09:53:48'), (4, 'Bob', 'Brown', 'bobbrown', 'Bobbrown@example.org', '2025-05-19 09:53:48'), (5, 'Charlie', 'Davis', 'charliedavis', 'charliedavis@example.link', '2025-05-19 09:53:48'), (6, 'Diana', 'Evans', 'dianaevans', 'dianaevans@example.edu', '2025-05-19 09:53:48'), (7, 'Ethan', 'Garcia', 'ethangarcia', 'ethangarcia@example.co.ng', '2025-05-19 09:53:48'), (8, 'Fiona', 'Harris', 'fionaharris', 'fionaharris@example.co.uk', '2025-05-19 09:53:48'), (9, 'George', 'Martinez', 'georgemartinez', 'georgemartinez@example.nz', '2025-05-19 09:53:48')]
+2025-05-19 12:08 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48'), (3, 'Alice', 'Johnson', 'alicejohnson', 'alicejohnson@example.net', '2025-05-19 09:53:48'), (4, 'Bob', 'Brown', 'bobbrown', 'Bobbrown@example.org', '2025-05-19 09:53:48'), (5, 'Charlie', 'Davis', 'charliedavis', 'charliedavis@example.link', '2025-05-19 09:53:48'), (6, 'Diana', 'Evans', 'dianaevans', 'dianaevans@example.edu', '2025-05-19 09:53:48'), (7, 'Ethan', 'Garcia', 'ethangarcia', 'ethangarcia@example.co.ng', '2025-05-19 09:53:48'), (8, 'Fiona', 'Harris', 'fionaharris', 'fionaharris@example.co.uk', '2025-05-19 09:53:48'), (9, 'George', 'Martinez', 'georgemartinez', 'georgemartinez@example.nz', '2025-05-19 09:53:48')]
+2025-05-19 12:15 - INFO - Connection to users.db successful
+2025-05-19 12:15 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:15 - INFO - Attempt 1 of 3
+2025-05-19 12:15 - INFO - Connection to users.db successful
+2025-05-19 12:15 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48')]
+2025-05-19 12:15 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48')]
+2025-05-19 12:15 - INFO - Connection to users.db successful
+2025-05-19 12:15 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:15 - INFO - Attempt 1 of 3
+2025-05-19 12:15 - INFO - Connection to users.db successful
+2025-05-19 12:15 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48')]
+2025-05-19 12:15 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48')]
+2025-05-19 12:16 - INFO - Connection to users.db successful
+2025-05-19 12:16 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 12:16 - INFO - Attempt 1 of 3
+2025-05-19 12:16 - INFO - Connection to users.db successful
+2025-05-19 12:16 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48')]
+2025-05-19 12:16 - INFO - Query successful: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48')]

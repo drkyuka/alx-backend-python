@@ -1,9 +1,8 @@
 """Module contains a decorator that manages database transactions by automatically committing or rolling back changes"""
 
+import functools
 import logging
 import sqlite3
-import functools
-from typing import Any
 
 with_db_connection = __import__("1-with_db_connection").with_db_connection
 get_user_by_id = __import__("1-with_db_connection").get_user_by_id
@@ -16,23 +15,26 @@ def transactional(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        connection: sqlite3.Connection = args[0]
+        # Make sure we have a connection as the first argument
+        if not args or not isinstance(args[0], sqlite3.Connection):
+            raise ValueError("First argument must be a database connection")
+
+        connection = args[0]
         try:
             logging.info("Starting transaction...")
-            result: Any = func(*args, **kwargs)
+            result = func(*args, **kwargs)
             connection.commit()
             logging.info("Transaction committed successfully.")
             return result
         except sqlite3.Error as e:
-            connection.rollback()
+            if connection:
+                connection.rollback()
             logging.error("Transaction failed. Changes rolled back.")
             logging.error("Error: %s", e)
             logging.exception(e)
             raise e
-        finally:
-            if connection:
-                logging.info("Closing database transaction connection.")
-                connection.close()
+        # Remove the finally block with connection.close()
+        # because with_db_connection will handle closing the connection
 
     return wrapper
 
