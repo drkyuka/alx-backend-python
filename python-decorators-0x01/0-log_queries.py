@@ -2,8 +2,7 @@
 This script creates a decorator that logs database queries executed by any function
 """
 
-import sqlite3
-import functools
+import sqlite3, functools, datetime
 
 #### decorator to lof SQL queries
 import logging
@@ -15,13 +14,16 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M",
     )
 
+logfile = f'dbqquery{datetime.datetime.now()}.log'
+logging.FileHandler(logfile, mode='a')
+
 
 def log_queries():
     """
     Decorator to log SQL queries executed by the function
     """
     def logging_decorator(f):
-        
+
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
             query = args[0] if args else kwargs.get('query')
@@ -32,9 +34,16 @@ def log_queries():
                 return None
             
             logging.info(f"Query to be exexuted: {query}")
+            try:
+                result = f(*args, **kwargs)
+                logging.info(f"Query executed successfully: {query}")
+            except Exception as e:
+                logging.error(f"Error executing query: {query}")
+                logging.exception(e)
+                return None
 
             # Call the original function
-            return func(*args, **kwargs)
+            return result
         return wrapper
     return logging_decorator
 
