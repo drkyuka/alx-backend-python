@@ -25,9 +25,9 @@ def lazy_paginate(page_size: int):
 
         if not rows:
             break
-        
+
         # yield results
         yield rows
-        
+
         # increment offset
         offset += page_size

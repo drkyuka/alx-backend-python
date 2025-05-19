@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 # create a generator that streams rows from an SQL database one by one.
-seed = __import__('seed')
+seed = __import__("seed")
+
 
 def stream_users():
     # function that uses a generator to fetch rows one by one from the user_data table

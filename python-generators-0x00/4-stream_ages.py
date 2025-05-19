@@ -2,9 +2,11 @@
 
 users = __import__("0-stream_users").stream_users
 
+
 def stream_user_ages():
     """Generator function to stream user from the database."""
     yield from users()
+
 
 def compute_average_age():
     """Function to compute the average age of users."""

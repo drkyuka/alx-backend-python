@@ -1,10 +1,14 @@
 -- SQLite script to create users table and populate with sample data
 
 -- Create the users table with proper fields
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     firstname VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,
+    -- username VARCHAR(50) UNIQUE NOT NULL,
+    -- email VARCHAR(100) UNIQUE NOT NULL,
     date_created DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -12,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
 DELETE FROM users;
 
 -- Reset the autoincrement counter
-DELETE FROM sqlite_sequence WHERE name='users';
+-- DELETE FROM sqlite_sequence WHERE name='users';
 
 -- Insert 100 sample users
 INSERT INTO users (firstname, lastname) VALUES
