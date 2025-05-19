@@ -1,10 +1,12 @@
+"""This module provides a decorator to manage SQLite database connections"""
+
 import sqlite3
 import functools
 import logging
 from datetime import datetime
 
 #### decorator to lof SQL queries
-logfile = f"logs/dbqquery-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+logfile = f"logs/dbqquery-{datetime.now().strftime('%Y-%m-%d')}.log"
 logging.basicConfig(
     level=logging.INFO,
     format="{asctime} - {levelname} - {message}",
@@ -26,11 +28,9 @@ def with_db_connection(func):
             conn: sqlite3.Connection = sqlite3.connect(userdb)
             logging.info("Connection to %s successful", userdb)
 
-            user_id = kwargs.get("user_id")
-            if user_id:
-                result = func(conn, user_id)
-            else:
-                result = func(conn, args)
+            # Pass the connection as the first argument, then all args and kwargs
+            result = func(conn, *args, **kwargs)
+            logging.info("Query successful: %s", result)
             return result
         except sqlite3.Error as e:
             logging.error("Connection to %s failed. Error: %s", userdb, e)

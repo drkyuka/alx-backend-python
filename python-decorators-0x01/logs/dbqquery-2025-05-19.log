@@ -18,3 +18,50 @@
 2025-05-19 10:19 - INFO - Connection to users.db closed.
 2025-05-19 10:19 - INFO - Connection to users.db successful.
 2025-05-19 10:19 - INFO - Connection to users.db closed.
+2025-05-19 10:54 - INFO - Query to be exexuted: SELECT * FROM users
+2025-05-19 10:54 - INFO - Query executed successfully: [(1, 'John', 'Doe', 'johndoe', 'johndoe@example.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48'), (3, 'Alice', 'Johnson', 'alicejohnson', 'alicejohnson@example.net', '2025-05-19 09:53:48'), (4, 'Bob', 'Brown', 'bobbrown', 'Bobbrown@example.org', '2025-05-19 09:53:48'), (5, 'Charlie', 'Davis', 'charliedavis', 'charliedavis@example.link', '2025-05-19 09:53:48'), (6, 'Diana', 'Evans', 'dianaevans', 'dianaevans@example.edu', '2025-05-19 09:53:48'), (7, 'Ethan', 'Garcia', 'ethangarcia', 'ethangarcia@example.co.ng', '2025-05-19 09:53:48'), (8, 'Fiona', 'Harris', 'fionaharris', 'fionaharris@example.co.uk', '2025-05-19 09:53:48'), (9, 'George', 'Martinez', 'georgemartinez', 'georgemartinez@example.nz', '2025-05-19 09:53:48')]
+2025-05-19 10:54 - INFO - Connection to users.db successful
+2025-05-19 10:55 - INFO - Connection to users.db successful
+2025-05-19 10:55 - INFO - Connection to users.db successful
+2025-05-19 11:01 - INFO - Connection to users.db successful
+2025-05-19 11:01 - INFO - Connection to users.db successful
+2025-05-19 11:03 - INFO - Connection to users.db successful
+2025-05-19 11:03 - INFO - Connection to users.db successful
+2025-05-19 11:04 - INFO - Connection to users.db successful
+2025-05-19 11:04 - INFO - Connection to users.db successful
+2025-05-19 11:04 - INFO - Connection to users.db successful
+2025-05-19 11:04 - INFO - Connection to users.db successful
+2025-05-19 11:05 - INFO - Query to be exexuted: SELECT * FROM users
+2025-05-19 11:05 - INFO - Query executed successfully: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@hotmail.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48'), (3, 'Alice', 'Johnson', 'alicejohnson', 'alicejohnson@example.net', '2025-05-19 09:53:48'), (4, 'Bob', 'Brown', 'bobbrown', 'Bobbrown@example.org', '2025-05-19 09:53:48'), (5, 'Charlie', 'Davis', 'charliedavis', 'charliedavis@example.link', '2025-05-19 09:53:48'), (6, 'Diana', 'Evans', 'dianaevans', 'dianaevans@example.edu', '2025-05-19 09:53:48'), (7, 'Ethan', 'Garcia', 'ethangarcia', 'ethangarcia@example.co.ng', '2025-05-19 09:53:48'), (8, 'Fiona', 'Harris', 'fionaharris', 'fionaharris@example.co.uk', '2025-05-19 09:53:48'), (9, 'George', 'Martinez', 'georgemartinez', 'georgemartinez@example.nz', '2025-05-19 09:53:48')]
+2025-05-19 11:06 - INFO - Query to be exexuted: SELECT * FROM users
+2025-05-19 11:06 - INFO - Query executed successfully: [(1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@hotmail.com', '2025-05-19 09:53:48'), (2, 'Jane', 'Smith', 'janesmith', 'janesmith@example.com', '2025-05-19 09:53:48'), (3, 'Alice', 'Johnson', 'alicejohnson', 'alicejohnson@example.net', '2025-05-19 09:53:48'), (4, 'Bob', 'Brown', 'bobbrown', 'Bobbrown@example.org', '2025-05-19 09:53:48'), (5, 'Charlie', 'Davis', 'charliedavis', 'charliedavis@example.link', '2025-05-19 09:53:48'), (6, 'Diana', 'Evans', 'dianaevans', 'dianaevans@example.edu', '2025-05-19 09:53:48'), (7, 'Ethan', 'Garcia', 'ethangarcia', 'ethangarcia@example.co.ng', '2025-05-19 09:53:48'), (8, 'Fiona', 'Harris', 'fionaharris', 'fionaharris@example.co.uk', '2025-05-19 09:53:48'), (9, 'George', 'Martinez', 'georgemartinez', 'georgemartinez@example.nz', '2025-05-19 09:53:48')]
+2025-05-19 11:06 - INFO - Connection to users.db successful
+2025-05-19 11:06 - INFO - Connection to users.db successful
+2025-05-19 11:06 - INFO - Connection to users.db successful
+2025-05-19 11:06 - INFO - Connection to users.db successful
+2025-05-19 11:08 - INFO - Connection to users.db successful
+2025-05-19 11:08 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@hotmail.com', '2025-05-19 09:53:48')
+2025-05-19 11:08 - INFO - Connection to users.db successful
+2025-05-19 11:08 - INFO - Starting transaction...
+2025-05-19 11:08 - INFO - Transaction committed successfully.
+2025-05-19 11:08 - INFO - Query successful: None
+2025-05-19 11:08 - INFO - Query successful: None
+2025-05-19 11:08 - INFO - Connection to users.db successful
+2025-05-19 11:08 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@hotmail.com', '2025-05-19 09:53:48')
+2025-05-19 11:09 - INFO - Connection to users.db successful
+2025-05-19 11:09 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@hotmail.com', '2025-05-19 09:53:48')
+2025-05-19 11:09 - INFO - Connection to users.db successful
+2025-05-19 11:09 - INFO - Starting transaction...
+2025-05-19 11:09 - INFO - Transaction committed successfully.
+2025-05-19 11:09 - INFO - Query successful: None
+2025-05-19 11:09 - INFO - Query successful: None
+2025-05-19 11:09 - INFO - Connection to users.db successful
+2025-05-19 11:09 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 11:11 - INFO - Connection to users.db successful
+2025-05-19 11:11 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
+2025-05-19 11:11 - INFO - Connection to users.db successful
+2025-05-19 11:11 - INFO - Starting transaction...
+2025-05-19 11:11 - INFO - Transaction committed successfully.
+2025-05-19 11:11 - INFO - Query successful: None
+2025-05-19 11:11 - INFO - Connection to users.db successful
+2025-05-19 11:11 - INFO - Query successful: (1, 'John', 'Doe', 'johndoe', 'Crawford_Cartwright@live.com', '2025-05-19 09:53:48')
