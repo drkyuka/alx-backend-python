@@ -21,21 +21,21 @@ def cache_query(func):
     def wrapper(*args, **kwargs):
         # Check if the query is already cached
         query = kwargs.get("query")
-        hashed_query = sha256(query.encode()).hexdigest()
+        query_hash = sha256(query.encode()).hexdigest()
 
         # check if the query is cached, return the cached result
-        if hashed_query in query_cache:
+        if query_hash in query_cache:
             logging.info("Using cached result for query: %s", query)
-            return query_cache.get(hashed_query)
+            return query_cache.get(query_hash)
 
         # Create a new cache entry
-        logging.info("Executing query: %s", query)
-        result = func(*args, **kwargs)
+        logging.error("Failed to find query in cache, executing query: %s", query)
+        query_result = func(*args, **kwargs)
 
-        logging.info(f"Caching result for query: %s: %s", hashed_query, result)
-        query_cache[hashed_query] = result
-        logging.info("Cached result for query: %s", hashed_query)
-        return result
+        logging.info(f"Caching result for query: %s: %s", query_hash, query_result)
+        query_cache[query_hash] = query_result
+        logging.info("Cached result for query: %s", query_hash)
+        return query_result
 
     return wrapper
 
