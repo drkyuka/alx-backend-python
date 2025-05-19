@@ -7,23 +7,36 @@ import functools
 
 #### decorator to lof SQL queries
 import logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, 
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    format="{asctime} - {levelname} - {message}",
+    style="{",
+    datefmt="%Y-%m-%d %H:%M",
+    )
 
-def log_queries(func):
-    def wrapper(*args, **kwargs):
-        query = args[0] if args else kwargs.get('query')
 
-        # Check if the query is provided
-        if not query:
-            logging.error("No query provided to log.")
-            return None
+def log_queries():
+    """
+    Decorator to log SQL queries executed by the function
+    """
+    def logging_decorator(f):
         
-        logging.info(f"Query to be exexuted: {query}")
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            query = args[0] if args else kwargs.get('query')
 
-        # Call the original function
-        return func(*args, **kwargs)
+            # Check if the query is provided
+            if not query:
+                logging.error("No query provided to log.")
+                return None
+            
+            logging.info(f"Query to be exexuted: {query}")
 
-    return wrapper
+            # Call the original function
+            return func(*args, **kwargs)
+        return wrapper
+    return logging_decorator
 
 
 @log_queries
