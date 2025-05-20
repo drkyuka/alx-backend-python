@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "30a9691fd075ca0b029641daf88b57c7494e7a1ff2797b37eaf3199a314dad19"
+            "sha256": "324f02c1e0a321b9c622a36ebc375b10cdb2dd80de0677af23d2015c57350f2c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,22 @@
         ]
     },
     "default": {
+        "aiosqlite": {
+            "hashes": [
+                "sha256:131bb8056daa3bc875608c631c678cda73922a2d4ba8aec373b19f18c17e7aa3",
+                "sha256:2549cf4057f95f53dcba16f2b64e8e2791d7e1adedb13197dd8ed77bb226d7d0"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==0.21.0"
+        },
+        "aiosqlite3": {
+            "hashes": [
+                "sha256:11efa1b61bdf621f1ba5568bd4ac7db6387b49cf11f4b99f6aa5e6668591ae85"
+            ],
+            "index": "pypi",
+            "version": "==0.3.0"
+        },
         "dotenv": {
             "hashes": [
                 "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9"
@@ -90,6 +106,14 @@
             "index": "pypi",
             "markers": "python_version >= '3.7'",
             "version": "==0.11.10"
+        },
+        "typing-extensions": {
+            "hashes": [
+                "sha256:a439e7c04b49fec3e5d3e2beaa21755cadbbdc391694e28ccdd36ca4a1408f8c",
+                "sha256:e6c81219bd689f51865d9e372991c540bda33a0379d5573cddb9a3a23f7caaef"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==4.13.2"
         }
     },
     "develop": {}
