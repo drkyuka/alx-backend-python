@@ -18,6 +18,9 @@ if not db_file_exists:
 
 
 async def async_fetch_users():
+    """
+    Fetch all users from the database asynchronously.
+    """
     async with aiosqlite.connect(user_db) as db_conn:
         cursor = await db_conn.cursor()
 
@@ -36,6 +39,9 @@ async def async_fetch_users():
 
 
 async def async_fetch_older_users():
+    """
+    Fetch users older than 40 from the database asynchronously.
+    """
     async with aiosqlite.connect(user_db) as db_conn:
         cursor = await db_conn.cursor()
 
