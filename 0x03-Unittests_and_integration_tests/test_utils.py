@@ -32,15 +32,14 @@ class TestAccessNestedMap(unittest.TestCase):
         """
         Test accessing a nested map with valid keys.
         """
-        self.assertEqual(access_nested_map(nested_map, path), expected)
+        result: Any = access_nested_map(nested_map, path)
+        self.assertEqual(result, expected)
 
     @parameterized.expand(  # type: ignore
         [({}, ("a",)), ({"a": 1}, ("a", "b"))]
     )
     def test_access_nested_map_exception(
-        self,
-        nested_map: dict[str, Any],
-        path: tuple[str, ...],
+        self, nested_map: dict[str, Any], path: tuple[str, ...]
     ) -> None:
         """
         Test exception when accessing a nested map with a missing key.
