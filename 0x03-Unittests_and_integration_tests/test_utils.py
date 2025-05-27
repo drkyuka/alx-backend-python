@@ -53,7 +53,7 @@ class TestGetJson(unittest.TestCase):
     """
 
     @staticmethod
-    def url_search(url: str):
+    def url_search(url):
         """Return a mock response object with a .json() method
         for the given URL."""
         url_list = {
@@ -72,9 +72,7 @@ class TestGetJson(unittest.TestCase):
         ]
     )
     @patch("utils.requests.get", side_effect=url_search)
-    def test_get_json(
-        self, url: str, expected_value: dict[str, bool], mock_get: Mock
-    ) -> None:
+    def test_get_json(self, url, expected_value, mock_get):
         """
         Test getting JSON from a URL.
         """
