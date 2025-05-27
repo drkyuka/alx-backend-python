@@ -4,7 +4,7 @@ This script contains utility functions for testing purposes.
 It includes function for Unittests and Integration Tests
 """
 
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import unittest
 from parameterized import parameterized
 
@@ -52,28 +52,32 @@ class TestGetJson(unittest.TestCase):
     Test case for the get_json function.
     """
 
+    @staticmethod
+    def url_search(url: str):
+        """Return a mock response object with a .json() method
+        for the given URL."""
+        url_list = {
+            "http://example.com": {"payload": True},
+            "http://holberton.io": {"payload": False},
+        }
+
+        mock_resp = Mock()
+        mock_resp.json.return_value = url_list[url]
+        return mock_resp
+
     @parameterized.expand(  # type: ignore
         [
             ("http://example.com", {"payload": True}),
             ("http://holberton.io", {"payload": False}),
         ]
     )
-    def test_get_json(self, url, expected_value) -> None:
+    @patch("utils.requests.get", side_effect=url_search)
+    def test_get_json(
+        self, url: str, expected_value: dict[str, bool], mock_get: Mock
+    ) -> None:
         """
         Test getting JSON from a URL.
         """
-
-        with patch("utils.requests.get") as mock_get:
-            # Setup the mock to return a response with the expected JSON data
-            mock_response = mock_get.return_value
-            mock_response.json.return_value = expected_value
-            # mock_response.status_code = 200
-
-            # Call the function with our mocked response
-            response = get_json(url)
-
-            # Assert that the mock was called exactly once with the expected URL
-            mock_get.assert_called_once_with(url)
-
-            # Assert that our function returns the expected result
-            self.assertEqual(response, expected_value)
+        response = get_json(url)
+        mock_get.assert_called_once_with(url)
+        self.assertEqual(response, expected_value)
