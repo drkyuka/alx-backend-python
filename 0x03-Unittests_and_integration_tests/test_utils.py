@@ -6,10 +6,12 @@ It includes function for Unittests and Integration Tests
 
 from unittest.mock import Mock, patch
 import unittest
+from urllib import response
 from parameterized import parameterized
 
 access_nested_map = __import__("utils").access_nested_map
 get_json = __import__("utils").get_json
+memoize = __import__("utils").memoize
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -60,8 +62,13 @@ class TestGetJson(unittest.TestCase):
             "http://holberton.io": {"payload": False},
         }
 
+        # create a mock response object
         mock_resp = Mock()
+
+        # set the .json() method to return the corresponding value
         mock_resp.json.return_value = url_list[url]
+
+        # return the mock response object
         return mock_resp
 
     @parameterized.expand(  # type: ignore
@@ -76,6 +83,58 @@ class TestGetJson(unittest.TestCase):
         """
 
         with patch("utils.requests.get", side_effect=self.url_search) as mock_get:
-            response = get_json(url)
+            # Call the get_json function with the URL
+            json_response = get_json(url)
+
+            # Check that the mock was called with the correct URL
             mock_get.assert_called_once_with(url)
-            self.assertEqual(response, expected_value)
+
+            # Check that the JSON response matches the expected value
+            self.assertEqual(json_response, expected_value)
+
+
+class TestMemoize(unittest.TestCase):
+    """
+    Test case for the memoize decorator.
+    """
+
+    def test_memoize(self):
+        """
+        Test that the memoize decorator caches the result of a method.
+        """
+
+        class TestClass:
+            """
+            A simple class to test the memoize decorator.
+            """
+
+            def a_method(self):
+                """
+                A method that returns a value.
+                This method is decorated with memoize.
+                """
+                return 42
+
+            @memoize
+            def a_property(self):
+                """
+                A property that calls a_method.
+                This property is decorated with memoize.
+                """
+                return self.a_method()
+
+        # Create an instance of TestClass
+        usecase = TestClass()
+
+        # Call the memoized method
+        with patch.object(usecase, "a_method", return_value=42) as mock_get:
+            # Call the memoized property
+            result1 = usecase.a_property
+            result2 = usecase.a_property
+
+            # Check that the method was called only once
+            mock_get.assert_called_once()
+
+            # Check that the result is cached
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
