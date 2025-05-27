@@ -4,6 +4,7 @@ This script contains utility functions for testing purposes.
 It includes function for Unittests and Integration Tests
 """
 
+from unittest.mock import patch
 import unittest
 from parameterized import parameterized
 
@@ -44,3 +45,35 @@ class TestAccessNestedMap(unittest.TestCase):
         """
         with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
+
+
+class TestGetJson(unittest.TestCase):
+    """
+    Test case for the get_json function.
+    """
+
+    @parameterized.expand(  # type: ignore
+        [
+            ("http://example.com", {"payload": True}),
+            ("http://holberton.io", {"payload": False}),
+        ]
+    )
+    def test_get_json(self, url, expected_value) -> None:
+        """
+        Test getting JSON from a URL.
+        """
+
+        with patch("utils.requests.get") as mock_get:
+            # Setup the mock to return a response with the expected JSON data
+            mock_response = mock_get.return_value
+            mock_response.json.return_value = expected_value
+            # mock_response.status_code = 200
+
+            # Call the function with our mocked response
+            response = get_json(url)
+
+            # Assert that the mock was called exactly once with the expected URL
+            mock_get.assert_called_once_with(url)
+
+            # Assert that our function returns the expected result
+            self.assertEqual(response, expected_value)
