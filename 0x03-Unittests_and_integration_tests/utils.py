@@ -86,6 +86,9 @@ def valued_access_nested_map() -> None:
     print(access_nested_map(nested_map={}, path=("a",)))
     print(access_nested_map(nested_map={"a": 1}, path=("a", "b")))
 
+    print("_" * 20)
+    print(get_json("https://jsonplaceholder.typicode.com/posts/1"))
+
 
 if __name__ == "__main__":
     valued_access_nested_map()

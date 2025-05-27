@@ -9,6 +9,7 @@ from typing import Any, Union
 from parameterized import parameterized
 
 access_nested_map = __import__("utils").access_nested_map
+get_json = __import__("utils").get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -46,3 +47,21 @@ class TestAccessNestedMap(unittest.TestCase):
         """
         with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
+
+
+class TestGetJson(unittest.TestCase):
+    """
+    Test case for the get_json function.
+    """
+
+    @parameterized.expand(  # type: ignore
+        [
+            ("https://jsonplaceholder.typicode.com/posts/1", {"userId": 1}),
+            ("https://jsonplaceholder.typicode.com/posts/2", {"userId": 1}),
+        ]
+    )
+    def test_get_json(self, url: str, expected: dict[str, Any]) -> None:
+        """
+        Test getting JSON from a URL.
+        """
+        pass
