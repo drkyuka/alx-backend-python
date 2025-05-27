@@ -2,10 +2,10 @@
 """A github org client"""
 
 import unittest
+from unittest.mock import PropertyMock, patch
 
-from unittest.mock import patch
-from parameterized import parameterized
 from client import GithubOrgClient
+from parameterized import parameterized
 
 
 # Test class for GithubOrgClient
@@ -39,3 +39,31 @@ class TestGithubOrgClient(unittest.TestCase):
 
         # Check that get_json was called with the correct URL
         mock_get_json.assert_called_once_with(org_url)
+
+    def test_public_repos_url(self):
+        """
+        Test for mocking a property
+        """
+
+        # Mock the org method to return a specific value
+        # org is a method of GithubOrgClient
+        # that returns a dictionary with a "repos_url" key
+        # use PropertyMock to mock the org as a property
+        with patch.object(
+            GithubOrgClient, "org", new_callable=PropertyMock
+        ) as mock_client:
+            # set the expected mock value
+            mock_client.return_value = {
+                "repos_url": "https://api.github.com/orgs/google"
+            }
+
+            # Create an instance of GithubOrgClient
+            # and check the _public_repos_url property
+            # matches the expected URL
+            self.assertEqual(
+                GithubOrgClient("google")._public_repos_url,
+                "https://api.github.com/orgs/google",
+            )
+
+            # Check that the mock was called once
+            mock_client.assert_called_once()
