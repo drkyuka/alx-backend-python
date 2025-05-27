@@ -20,7 +20,10 @@ class TestGithubOrgClient(unittest.TestCase):
     )
     @patch("client.get_json")
     def test_org(self, org_name, mock_get_json):
-        """Test the org method"""
+        """
+        Parameterize and patch as decorators
+        Test the org method
+        """
         org_url = f"https://api.github.com/orgs/{org_name}"
 
         # Mock the return value of get_json
