@@ -52,8 +52,7 @@ class TestGetJson(unittest.TestCase):
     Test case for the get_json function.
     """
 
-    @staticmethod
-    def url_search(url):
+    def url_search(self, url):
         """Return a mock response object with a .json() method
         for the given URL."""
         url_list = {
@@ -71,11 +70,12 @@ class TestGetJson(unittest.TestCase):
             ("http://holberton.io", {"payload": False}),
         ]
     )
-    @patch("utils.requests.get", side_effect=url_search)
-    def test_get_json(self, url, expected_value, mock_get):
+    def test_get_json(self, url, expected_value):
         """
         Test getting JSON from a URL.
         """
-        response = get_json(url)
-        mock_get.assert_called_once_with(url)
-        self.assertEqual(response, expected_value)
+
+        with patch("utils.requests.get", side_effect=self.url_search) as mock_get:
+            response = get_json(url)
+            mock_get.assert_called_once_with(url)
+            self.assertEqual(response, expected_value)
