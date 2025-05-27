@@ -4,9 +4,8 @@ This script contains utility functions for testing purposes.
 It includes function for Unittests and Integration Tests
 """
 
-from unittest.mock import Mock, patch
 import unittest
-from urllib import response
+from unittest.mock import Mock, patch
 from parameterized import parameterized
 
 access_nested_map = __import__("utils").access_nested_map
@@ -54,7 +53,7 @@ class TestGetJson(unittest.TestCase):
     Test case for the get_json function.
     """
 
-    def url_get(self, url):
+    def get_url(self, url):
         """Return a mock response object with a .json() method
         for the given URL."""
         url_list = {
@@ -82,7 +81,7 @@ class TestGetJson(unittest.TestCase):
         Test getting JSON from a URL.
         """
 
-        with patch("utils.requests.get", side_effect=self.url_get) as mock:
+        with patch("utils.requests.get", side_effect=self.get_url) as mock:
             # Call the get_json function with the URL
             json_response = get_json(url)
 
