@@ -57,3 +57,9 @@ class GithubOrgClient:
         except KeyError:
             return False
         return has_license
+
+
+if __name__ == "__main__":
+    client = GithubOrgClient("google")
+    print(client.has_license({"license": {"key": "my_license"}}, "my_license"))
+    print(client.has_license({"license": {"key": "other_license"}}, "my_license"))
