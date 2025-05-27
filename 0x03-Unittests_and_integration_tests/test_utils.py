@@ -5,7 +5,6 @@ It includes function for Unittests and Integration Tests
 """
 
 import unittest
-from typing import Any, Union
 from parameterized import parameterized
 
 access_nested_map = __import__("utils").access_nested_map
@@ -26,42 +25,22 @@ class TestAccessNestedMap(unittest.TestCase):
     )
     def test_access_nested_map(
         self,
-        nested_map: dict[str, Any],
-        path: tuple[str, ...],
-        expected: Union[int, dict[str, int]],
+        nested_map,
+        path,
+        expected,
     ) -> None:
         """
         Test accessing a nested map with valid keys.
         """
-        result: Any = access_nested_map(nested_map, path)
+        result = access_nested_map(nested_map, path)
         self.assertEqual(result, expected)
 
     @parameterized.expand(  # type: ignore
         [({}, ("a",)), ({"a": 1}, ("a", "b"))]
     )
-    def test_access_nested_map_exception(
-        self, nested_map: dict[str, Any], path: tuple[str, ...]
-    ) -> None:
+    def test_access_nested_map_exception(self, nested_map, path) -> None:
         """
         Test exception when accessing a nested map with a missing key.
         """
         with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
-
-
-class TestGetJson(unittest.TestCase):
-    """
-    Test case for the get_json function.
-    """
-
-    @parameterized.expand(  # type: ignore
-        [
-            ("https://jsonplaceholder.typicode.com/posts/1", {"userId": 1}),
-            ("https://jsonplaceholder.typicode.com/posts/2", {"userId": 1}),
-        ]
-    )
-    def test_get_json(self, url: str, expected: dict[str, Any]) -> None:
-        """
-        Test getting JSON from a URL.
-        """
-        pass
