@@ -16,16 +16,25 @@ class UserSerializer(serializers.ModelSerializer):
 
         model = User
         fields = "__all__"
+        read_only_fields = ("user_id",)
 
 
 class ConversationSerializer(serializers.ModelSerializer):
     """Serializer for the Conversation model."""
+
+    participants = UserSerializer(many=True, read_only=True)
+    messages = serializers.SerializerMethodField(method_name="get_messages")
+
+    def get_messages(self, obj):
+        """Get messages for the conversation."""
+        return MessageSerializer(obj.messages.all(), many=True).data
 
     class Meta:
         """Meta class for ConversationSerializer."""
 
         model = Conversation
         fields = "__all__"
+        read_only_fields = ("conversation_id",)
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -36,3 +45,24 @@ class MessageSerializer(serializers.ModelSerializer):
 
         model = Message
         fields = "__all__"
+        read_only_fields = ("message_id",)
+        extra_kwargs = {
+            "sender": {"required": True},
+            "receiver": {"required": True},
+            "content": {"required": True},
+        }
+
+    # validate messages without valid users
+    def validate(self, attrs):
+        """Validate that the sender and receiver are valid users."""
+
+        if attrs["sender"] == attrs["receiver"]:
+            raise serializers.ValidationError(
+                "Sender and receiver cannot be the same user."
+            )
+
+        if not User.objects.filter(user_id=attrs["sender"].user_id).exists():
+            raise serializers.ValidationError("Sender does not exist.")
+
+        if not User.objects.filter(user_id=attrs["receiver"].user_id).exists():
+            raise serializers.ValidationError("Receiver does not exist.")

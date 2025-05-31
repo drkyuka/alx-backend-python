@@ -6,10 +6,11 @@ including the structure of the database tables.
 
 import uuid
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
 
 
 # Create your models here.
-class User(models.Model):
+class User(AbstractBaseUser):
     """
     Model representing a user in the messaging application.
     """
@@ -64,9 +65,8 @@ class Conversation(models.Model):
         help_text="Unique identifier for the conversation",
     )
 
-    participants = models.ManyToManyField(  # type: ignore
+    participants = models.ManyToManyField(
         to=User,
-        related_name="conversations",
         help_text="Users participating in the conversation",
     )
 
@@ -84,11 +84,29 @@ class Message(models.Model):
         help_text="Unique identifier for the message",
     )
 
-    message_body = models.ForeignKey(
-        to=Conversation,
-        on_delete=models.CASCADE,
+    message_body = models.TextField(
+        help_text="Content of the message",
+    )
+
+    conversation = models.ForeignKey(
+        Conversation,
         related_name="messages",
+        on_delete=models.CASCADE,
         help_text="Conversation to which the message belongs",
+    )
+
+    sender = models.ForeignKey(
+        User,
+        related_name="sent_messages",
+        on_delete=models.CASCADE,
+        help_text="User who sent the message",
+    )
+
+    receiver = models.ForeignKey(
+        User,
+        related_name="received_messages",
+        on_delete=models.CASCADE,
+        help_text="User who received the message",
     )
 
     sent_at = models.DateTimeField(
