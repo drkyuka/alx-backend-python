@@ -22,19 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     """Serializer for the Message model."""
 
-    # message_count = serializers.SerializerMethodField(method_name="get_message_count")
-
-    class Meta:
-        """Meta class for MessageSerializer."""
-
-        model = Message
-        fields = "__all__"
-        read_only_fields = ("message_id",)
-        extra_kwargs = {
-            "sender": {"required": True},
-            "receiver": {"required": True},
-        }
-
     content = serializers.CharField(
         source="message_body",
         help_text="Content of the message",
@@ -45,9 +32,11 @@ class MessageSerializer(serializers.ModelSerializer):
         },
     )
 
-    # def get_message_count(self, obj) -> int:
-    #     """Get the count of messages in the conversation."""
-    #     return obj.conversation.messages.count()
+    message_count = serializers.SerializerMethodField(method_name="get_message_count")
+
+    def get_message_count(self, obj) -> int:
+        """Get the count of messages in the conversation."""
+        return obj.conversation.messages.count()
 
     def validate(self, attrs):
         sender = attrs.get("sender")
@@ -74,12 +63,23 @@ class MessageSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    class Meta:
+        """Meta class for MessageSerializer."""
+
+        model = Message
+        fields = "__all__"
+        read_only_fields = ("message_id",)
+        extra_kwargs = {
+            "sender": {"required": True},
+            "receiver": {"required": True},
+        }
+
 
 class ConversationSerializer(serializers.ModelSerializer):
     """Serializer for the Conversation model."""
 
     participants = UserSerializer(many=True, read_only=True)
-    messages = serializers.SerializerMethodField(method_name="get_messages")
+    messages = MessageSerializer(many=True, read_only=True, source="messages.all")
 
     class Meta:
         """Meta class for ConversationSerializer."""
@@ -88,11 +88,11 @@ class ConversationSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ("conversation_id",)
 
-    def get_messages(self, obj):
-        """Get all messages in the conversation."""
-        if not obj.messages.exists():
-            return None
+    # def get_messages(self, obj):
+    #     """Get all messages in the conversation."""
+    #     if not obj.messages.exists():
+    #         return None
 
-        return MessageSerializer(
-            obj.messages.all(), many=True, context=self.context
-        ).data
+    #     return MessageSerializer(
+    #         obj.messages.all(), many=True, context=self.context
+    #     ).data
