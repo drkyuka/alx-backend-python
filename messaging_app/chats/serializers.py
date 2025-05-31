@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     """Serializer for the Message model."""
 
-    message_count = serializers.SerializerMethodField(method_name="get_message_count")
+    # message_count = serializers.SerializerMethodField(method_name="get_message_count")
 
     class Meta:
         """Meta class for MessageSerializer."""
@@ -45,9 +45,9 @@ class MessageSerializer(serializers.ModelSerializer):
         },
     )
 
-    def get_message_count(self, obj) -> int:
-        """Get the count of messages in the conversation."""
-        return obj.conversation.messages.count()
+    # def get_message_count(self, obj) -> int:
+    #     """Get the count of messages in the conversation."""
+    #     return obj.conversation.messages.count()
 
     def validate(self, attrs):
         sender = attrs.get("sender")
