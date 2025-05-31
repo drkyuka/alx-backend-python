@@ -24,16 +24,6 @@ class MessageSerializer(serializers.ModelSerializer):
 
     message_count = serializers.SerializerMethodField(method_name="get_message_count")
 
-    content = serializers.CharField(
-        source="message_body",
-        help_text="Content of the message",
-        max_length=500,
-        error_messages={
-            "max_length": "Message content cannot exceed 500 characters.",
-            "required": "Message content is required.",
-        },
-    )
-
     class Meta:
         """Meta class for MessageSerializer."""
 
@@ -44,6 +34,16 @@ class MessageSerializer(serializers.ModelSerializer):
             "sender": {"required": True},
             "receiver": {"required": True},
         }
+
+    content = serializers.CharField(
+        source="message_body",
+        help_text="Content of the message",
+        max_length=500,
+        error_messages={
+            "max_length": "Message content cannot exceed 500 characters.",
+            "required": "Message content is required.",
+        },
+    )
 
     def get_message_count(self, obj) -> int:
         """Get the count of messages in the conversation."""
@@ -79,7 +79,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     """Serializer for the Conversation model."""
 
     participants = UserSerializer(many=True, read_only=True)
-    messages = MessageSerializer(many=True, read_only=True)  # Nested messages
+    messages = serializers.SerializerMethodField(method_name="get_messages")
 
     class Meta:
         """Meta class for ConversationSerializer."""
@@ -87,3 +87,12 @@ class ConversationSerializer(serializers.ModelSerializer):
         model = Conversation
         fields = "__all__"
         read_only_fields = ("conversation_id",)
+
+    def get_messages(self, obj):
+        """Get all messages in the conversation."""
+        if not obj.messages.exists():
+            return None
+
+        return MessageSerializer(
+            obj.messages.all(), many=True, context=self.context
+        ).data
