@@ -41,6 +41,8 @@ class ConversationSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     """Serializer for the Message model."""
 
+    message_count = serializers.SerializerMethodField(method_name="get_message_count")
+
     class Meta:
         """Meta class for MessageSerializer."""
 
@@ -62,17 +64,6 @@ class MessageSerializer(serializers.ModelSerializer):
         },
     )
 
-    # validate messages without valid users
-    def validate(self, attrs):
-        """Validate that the sender and receiver are valid users."""
-
-        if attrs["sender"] == attrs["receiver"]:
-            raise serializers.ValidationError(
-                "Sender and receiver cannot be the same user."
-            )
-
-        if not User.objects.filter(user_id=attrs["sender"].user_id).exists():
-            raise serializers.ValidationError("Sender does not exist.")
-
-        if not User.objects.filter(user_id=attrs["receiver"].user_id).exists():
-            raise serializers.ValidationError("Receiver does not exist.")
+    def get_message_count(self, obj) -> int:
+        """Get the count of messages in the conversation."""
+        return obj.conversation.messages.count()
