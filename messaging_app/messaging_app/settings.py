@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",  # djangorestframework
+    "rest_framework.permissions.IsAuthenticated",
+    "DEFAULT_AUTHENTICATION_CLASSES",
+    "rest_framework.authentication.SessionAuthentication",
     "messaging_app.chats.apps.ChatsConfig",  # Custom app for messaging.chats
 ]
 
