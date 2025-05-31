@@ -17,7 +17,7 @@ class User(AbstractBaseUser):
 
     user_id = models.UUIDField(
         primary_key=True,
-        default=uuid.uuid4(),
+        default=uuid.uuid4,
         editable=False,
         unique=True,
         help_text="Unique identifier for the user",
@@ -51,6 +51,15 @@ class User(AbstractBaseUser):
         help_text="Phone number of the user",
     )
 
+    USERNAME_FIELD = "email"
+
+    def __str__(self):
+        """
+        String representation of the User model.
+        Returns the email address of the user.
+        """
+        return f"{self.first_name} {self.last_name} <{self.email}>"
+
 
 class Conversation(models.Model):
     """
@@ -59,7 +68,7 @@ class Conversation(models.Model):
 
     conversation_id = models.UUIDField(
         primary_key=True,
-        default=uuid.uuid4(),
+        default=uuid.uuid4,
         editable=False,
         unique=True,
         help_text="Unique identifier for the conversation",
@@ -78,7 +87,7 @@ class Message(models.Model):
 
     message_id = models.UUIDField(
         primary_key=True,
-        default=uuid.uuid4(),
+        default=uuid.uuid4,
         editable=False,
         unique=True,
         help_text="Unique identifier for the message",

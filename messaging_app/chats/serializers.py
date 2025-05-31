@@ -29,7 +29,10 @@ class MessageSerializer(serializers.ModelSerializer):
         error_messages={
             "max_length": "Message content cannot exceed 500 characters.",
             "required": "Message content is required.",
+            "blank": "Message content cannot be blank.",
         },
+        required=True,
+        allow_blank=False,
     )
 
     message_count = serializers.SerializerMethodField(method_name="get_message_count")
@@ -51,6 +54,13 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         """Validate the message content and check sender/receiver."""
+
+        # Check if message_body exists and is not blank
+        message_body = attrs.get("message_body")
+        if not message_body or not message_body.strip():
+            raise serializers.ValidationError(
+                {"message_body": "Message content cannot be blank."}
+            )
 
         sender = attrs.get("sender")
         receiver = attrs.get("receiver")
@@ -86,7 +96,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         help_text="Messages in the conversation",
     )
 
-    users = UserSerializer(many=True, read_only=True)
+    participants = UserSerializer(many=True, read_only=True)
     participant_count = serializers.SerializerMethodField(
         method_name="get_participant_count",
         help_text="Count of participants in the conversation",
@@ -101,4 +111,4 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def get_participant_count(self, obj) -> int:
         """Get the count of participants in the conversation."""
-        return obj.users.count()
+        return obj.participants.count()
