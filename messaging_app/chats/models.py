@@ -4,7 +4,7 @@ This file defines the data models used in the chats application,
 including the structure of the database tables.
 """
 
-from uuid import UUID
+import uuid
 from django.db import models
 
 
@@ -16,7 +16,7 @@ class User(models.Model):
 
     user_id = models.UUIDField(
         primary_key=True,
-        default=UUID,
+        default=uuid.uuid4(),
         editable=False,
         unique=True,
         help_text="Unique identifier for the user",
@@ -58,7 +58,7 @@ class Conversation(models.Model):
 
     conversation_id = models.UUIDField(
         primary_key=True,
-        default=UUID,
+        default=uuid.uuid4(),
         editable=False,
         unique=True,
         help_text="Unique identifier for the conversation",
@@ -78,7 +78,7 @@ class Message(models.Model):
 
     message_id = models.UUIDField(
         primary_key=True,
-        default=UUID,
+        default=uuid.uuid4(),
         editable=False,
         unique=True,
         help_text="Unique identifier for the message",
