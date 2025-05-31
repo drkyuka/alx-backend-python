@@ -4,6 +4,7 @@
 # such as Django models, into JSON or other content types that can be easily rendered into a response.
 """
 
+from os import error
 from rest_framework import serializers
 from .models import User, Conversation, Message
 
@@ -49,8 +50,17 @@ class MessageSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "sender": {"required": True},
             "receiver": {"required": True},
-            "content": {"required": True},
         }
+
+    content = serializers.CharField(
+        source="message_body",
+        help_text="Content of the message",
+        max_length=500,
+        error_messages={
+            "max_length": "Message content cannot exceed 500 characters.",
+            "required": "Message content is required.",
+        },
+    )
 
     # validate messages without valid users
     def validate(self, attrs):
