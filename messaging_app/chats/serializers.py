@@ -34,11 +34,24 @@ class MessageSerializer(serializers.ModelSerializer):
 
     message_count = serializers.SerializerMethodField(method_name="get_message_count")
 
+    class Meta:
+        """Meta class for MessageSerializer."""
+
+        model = Message
+        fields = "__all__"
+        read_only_fields = ("message_id",)
+        extra_kwargs = {
+            "sender": {"required": True},
+            "receiver": {"required": True},
+        }
+
     def get_message_count(self, obj) -> int:
         """Get the count of messages in the conversation."""
         return obj.conversation.messages.count()
 
     def validate(self, attrs):
+        """Validate the message content and check sender/receiver."""
+
         sender = attrs.get("sender")
         receiver = attrs.get("receiver")
 
@@ -63,23 +76,21 @@ class MessageSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    class Meta:
-        """Meta class for MessageSerializer."""
-
-        model = Message
-        fields = "__all__"
-        read_only_fields = ("message_id",)
-        extra_kwargs = {
-            "sender": {"required": True},
-            "receiver": {"required": True},
-        }
-
 
 class ConversationSerializer(serializers.ModelSerializer):
     """Serializer for the Conversation model."""
 
-    participants = UserSerializer(many=True, read_only=True)
-    messages = MessageSerializer(many=True, read_only=True, source="messages.all")
+    messages = MessageSerializer(
+        many=True,
+        read_only=True,
+        help_text="Messages in the conversation",
+    )
+
+    users = UserSerializer(many=True, read_only=True)
+    participant_count = serializers.SerializerMethodField(
+        method_name="get_participant_count",
+        help_text="Count of participants in the conversation",
+    )
 
     class Meta:
         """Meta class for ConversationSerializer."""
@@ -88,11 +99,6 @@ class ConversationSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ("conversation_id",)
 
-    # def get_messages(self, obj):
-    #     """Get all messages in the conversation."""
-    #     if not obj.messages.exists():
-    #         return None
-
-    #     return MessageSerializer(
-    #         obj.messages.all(), many=True, context=self.context
-    #     ).data
+    def get_participant_count(self, obj) -> int:
+        """Get the count of participants in the conversation."""
+        return obj.users.count()
