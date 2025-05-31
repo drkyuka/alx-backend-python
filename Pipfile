@@ -16,6 +16,8 @@ requests = "*"
 pycodestyle = "*"
 pytest = "*"
 pipenv = "*"
+django = "*"
+djangorestframework = "*"
 
 [dev-packages]
 
