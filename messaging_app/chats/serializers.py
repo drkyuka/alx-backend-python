@@ -66,4 +66,4 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def get_message_count(self, obj) -> int:
         """Get the count of messages in the conversation."""
-        return obj.conversation.messages.count()
+        return obj.conversation.content.count()
