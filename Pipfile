@@ -19,6 +19,7 @@ pipenv = "*"
 django = "*"
 djangorestframework = "*"
 pygments = "*"
+django-rest-framework-nested = "*"
 
 [dev-packages]
 
