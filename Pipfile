@@ -18,6 +18,7 @@ pytest = "*"
 pipenv = "*"
 django = "*"
 djangorestframework = "*"
+pygments = "*"
 
 [dev-packages]
 
