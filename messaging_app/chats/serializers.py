@@ -5,7 +5,7 @@
 """
 
 from rest_framework import serializers
-from .models import User, Conversation, Message
+from .models import Conversation, Message, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,7 +41,16 @@ class MessageSerializer(serializers.ModelSerializer):
         """Meta class for MessageSerializer."""
 
         model = Message
-        fields = "__all__"
+        fields = [
+            "message_id",
+            "content",
+            "conversation",
+            "sender",
+            "receiver",
+            "sent_at",
+            "created_at",
+            "message_count",
+        ]
         read_only_fields = ("message_id",)
         extra_kwargs = {
             "sender": {"required": True},
@@ -59,7 +68,7 @@ class MessageSerializer(serializers.ModelSerializer):
         message_body = attrs.get("message_body")
         if not message_body or not message_body.strip():
             raise serializers.ValidationError(
-                {"message_body": "Message content cannot be blank."}
+                {"content": "Message content cannot be blank."}
             )
 
         sender = attrs.get("sender")
@@ -102,6 +111,13 @@ class ConversationSerializer(serializers.ModelSerializer):
         help_text="Count of participants in the conversation",
     )
 
+    participant_ids = serializers.ListField(
+        child=serializers.UUIDField(),
+        write_only=True,
+        required=False,
+        help_text="List of participant user IDs for creating a conversation",
+    )
+
     class Meta:
         """Meta class for ConversationSerializer."""
 
@@ -112,3 +128,19 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_participant_count(self, obj) -> int:
         """Get the count of participants in the conversation."""
         return obj.participants.count()
+
+    def create(self, validated_data):
+        """Create a new conversation with participants."""
+        participant_ids = validated_data.pop("participant_ids", [])
+        conversation = Conversation.objects.create(**validated_data)
+
+        # Add participants to the conversation
+        if participant_ids:
+            for user_id in participant_ids:
+                try:
+                    user = User.objects.get(user_id=user_id)
+                    conversation.participants.add(user)
+                except User.DoesNotExist:
+                    pass
+
+        return conversation
