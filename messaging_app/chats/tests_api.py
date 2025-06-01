@@ -185,3 +185,106 @@ class ConversationAPITestCase(TestCase):
         message_bodies = [msg["content"] for msg in response.data]
         self.assertIn(message1.message_body, message_bodies)
         self.assertIn(message2.message_body, message_bodies)
+
+
+class ConversationMessagesIntegrationTestCase(TestCase):
+    """Integration test for adding and listing messages in a conversation via API."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.client = APIClient()
+
+        # Create test users
+        self.user1 = User.objects.create(
+            email="user1@example.com",
+            password="testpassword1",
+            first_name="Test",
+            last_name="User1",
+            phone_number="1234567890",
+        )
+
+        self.user2 = User.objects.create(
+            email="user2@example.com",
+            password="testpassword2",
+            first_name="Test",
+            last_name="User2",
+            phone_number="9876543210",
+        )
+
+        # Authenticate user1
+        self.client.force_authenticate(user=self.user1)
+
+        # Create conversation
+        self.conversation = Conversation.objects.create()
+        self.conversation.participants.add(self.user1, self.user2)
+
+        # URL for sending messages to the conversation
+        self.messages_url = reverse(
+            "conversation-messages-list",
+            kwargs={"conversation_pk": self.conversation.conversation_id},
+        )
+
+    def test_add_and_list_multiple_messages(self):
+        """Test adding and listing multiple messages in a conversation."""
+        # Add first message
+        data1 = {
+            "content": "Hello from user1!",
+            "sender": str(self.user1.user_id),
+            "receiver": str(self.user2.user_id),
+        }
+        response1 = self.client.post(self.messages_url, data1, format="json")
+        self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
+
+        # Add second message
+        data2 = {
+            "content": "Reply from user2!",
+            "sender": str(self.user2.user_id),
+            "receiver": str(self.user1.user_id),
+        }
+        self.client.force_authenticate(user=self.user2)
+        response2 = self.client.post(self.messages_url, data2, format="json")
+        self.assertEqual(response2.status_code, status.HTTP_201_CREATED)
+
+        # Add third message
+        data3 = {
+            "content": "Another message from user1!",
+            "sender": str(self.user1.user_id),
+            "receiver": str(self.user2.user_id),
+        }
+        self.client.force_authenticate(user=self.user1)
+        response3 = self.client.post(self.messages_url, data3, format="json")
+        self.assertEqual(response3.status_code, status.HTTP_201_CREATED)
+
+        # List messages
+        response = self.client.get(self.messages_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+
+        # Check message contents
+        contents = [msg["content"] for msg in response.data]
+        self.assertIn("Hello from user1!", contents)
+        self.assertIn("Reply from user2!", contents)
+        self.assertIn("Another message from user1!", contents)
+
+
+class SeededDataValidationTestCase(TestCase):
+    """Test seeded data for conversations and messages integrity."""
+
+    def setUp(self):
+        from django.core.management import call_command
+
+        call_command("seed_chats")
+
+    def test_conversations_and_messages_integrity(self):
+        conversations = Conversation.objects.all()
+        self.assertGreaterEqual(conversations.count(), 12)
+        for convo in conversations:
+            participants = list(convo.participants.all())
+            self.assertGreaterEqual(len(participants), 2)
+            messages = convo.messages.all()
+            self.assertGreaterEqual(messages.count(), 1)
+            for msg in messages:
+                self.assertIn(msg.sender, participants)
+                self.assertIn(msg.receiver, participants)
+                self.assertNotEqual(msg.sender, msg.receiver)
+                self.assertTrue(msg.message_body)

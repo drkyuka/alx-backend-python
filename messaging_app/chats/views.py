@@ -2,13 +2,15 @@
 This file contains the ViewSets for the chats application.
 """
 
-from rest_framework import status, viewsets
+from typing import Any
+
+from django.db.models import QuerySet
+from rest_framework import filters, status, viewsets
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
-
-# Create your views here.
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -19,26 +21,30 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = [
+        "participants__email",
+        "participants__first_name",
+        "participants__last_name",
+    ]
+    ordering_fields = ["conversation_id"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Conversation]:
         """
         Override to filter conversations based on the authenticated user.
+        Returns conversations where the current user is a participant.
         """
-        return self.queryset.filter(
-            participants__user_id=self.request.user.user_id
-        ).distinct()
+        return self.queryset.filter(participants=self.request.user).distinct()
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """
         Override create method to handle conversation creation.
         """
         serializer = self.get_serializer(data=request.data)
 
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -49,8 +55,11 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["message_body", "sender__email", "receiver__email"]
+    ordering_fields = ["sent_at", "created_at"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Message]:
         """
         Override to filter messages based on the conversation parameter.
         """
@@ -62,28 +71,30 @@ class MessageViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """
         Override create method to handle message creation.
-        Set the conversation based on the URL.
         """
-        conversation_id = self.kwargs.get("conversation_pk")
         data = request.data.copy()
+        conversation_id = self.kwargs.get("conversation_pk")
 
         if conversation_id:
-            # Get the conversation
             try:
                 conversation = Conversation.objects.get(conversation_id=conversation_id)
                 data["conversation"] = str(conversation.conversation_id)
+                serializer = self.get_serializer(data=data)
+
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
             except Conversation.DoesNotExist:
                 return Response(
                     {"detail": "Conversation not found."},
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-        serializer = self.get_serializer(data=data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": "Conversation ID is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
