@@ -17,7 +17,6 @@ from .serializers import (
     CustomTokenSerializer,
     MessageSerializer,
 )
-from .auth import CustomJWTAuthentication
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -61,7 +60,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     Provides CRUD operations for Message model.
     """
 
-    queryset = Message.objects.all()
+    # Get all messages - permissions will filter access
+    queryset = Message.objects.all().distinct()
+
     serializer_class = MessageSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["message_body", "sender__email", "receiver__email"]
@@ -131,7 +132,6 @@ class CustomTokenView(TokenObtainPairView):
     """
 
     serializer_class = CustomTokenSerializer
-    # Added authentication and permission classes
-    # to authenticate users using JWT
-    authentication_classes = [CustomJWTAuthentication]
-    permission_classes = [IsActiveUser]
+    # Token generation endpoints should not require authentication
+    authentication_classes = []
+    permission_classes = []
