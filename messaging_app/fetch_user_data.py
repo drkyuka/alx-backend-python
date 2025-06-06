@@ -124,6 +124,25 @@ def load_tokens_from_file(filename: str = ".tokens.json") -> Optional[Dict[str, 
         return None
 
 
+def send_message(
+    base_url: str, token: str, conversation_id: str, content: str
+) -> Dict[str, Any]:
+    """Send a message to a specific conversation."""
+    url = f"{base_url}/api/conversations/{conversation_id}/messages/"
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    payload = {"content": content}
+
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(payload))
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending message to conversation {conversation_id}: {e}")
+        if hasattr(e.response, "text"):
+            print(f"Response content: {e.response.text}")
+        raise
+
+
 def main() -> None:
     """Main function to run the script."""
     parser = argparse.ArgumentParser(

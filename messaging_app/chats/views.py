@@ -11,11 +11,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Conversation, Message
+from .permissions import IsActiveUser, IsConversationParticipant
 from .serializers import (
     ConversationSerializer,
     CustomTokenSerializer,
     MessageSerializer,
 )
+from .auth import CustomJWTAuthentication
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -26,6 +28,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    permission_classes = [IsActiveUser]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = [
         "participants__email",
@@ -64,6 +67,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     search_fields = ["message_body", "sender__email", "receiver__email"]
     ordering_fields = ["sent_at", "created_at"]
 
+    # Add permission classes to ensure only participants can access messages
+    permission_classes = [IsActiveUser, IsConversationParticipant]
+
     def get_queryset(self) -> QuerySet[Message]:
         """
         Override to filter messages based on the conversation parameter.
@@ -79,6 +85,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """
         Override create method to handle message creation.
+        Validates that the sender is a participant in the conversation.
         """
         data = request.data.copy()
         conversation_id = self.kwargs.get("conversation_pk")
@@ -86,9 +93,21 @@ class MessageViewSet(viewsets.ModelViewSet):
         if conversation_id:
             try:
                 conversation = Conversation.objects.get(conversation_id=conversation_id)
-                data["conversation"] = str(conversation.conversation_id)
-                serializer = self.get_serializer(data=data)
 
+                # Check if the current user is a participant in the conversation
+                if not conversation.participants.filter(
+                    user_id=request.user.user_id
+                ).exists():
+                    return Response(
+                        {"detail": "You are not a participant in this conversation."},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+
+                # Set the sender to the current user
+                data["sender"] = str(request.user.user_id)
+                data["conversation"] = str(conversation.conversation_id)
+
+                serializer = self.get_serializer(data=data)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -112,7 +131,7 @@ class CustomTokenView(TokenObtainPairView):
     """
 
     serializer_class = CustomTokenSerializer
-    # Remove authentication and permission classes to allow unauthenticated access
-    # This is necessary because this endpoint is used to authenticate users
-    authentication_classes = []
-    permission_classes = []
+    # Added authentication and permission classes
+    # to authenticate users using JWT
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsActiveUser]
