@@ -5,6 +5,8 @@
 """
 
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 from .models import Conversation, Message, User
 
 
@@ -144,3 +146,15 @@ class ConversationSerializer(serializers.ModelSerializer):
                     pass
 
         return conversation
+
+
+class CustomTokenSerializer(TokenObtainPairSerializer):
+    """Serializer for custom token generation."""
+
+    username_field = "email"
+
+    def validate(self, attrs):
+        """Validate that the user exists."""
+        # Call parent validate method which handles authentication
+        # The parent class will use our username_field setting
+        return super().validate(attrs)

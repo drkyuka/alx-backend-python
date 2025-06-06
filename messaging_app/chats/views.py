@@ -8,9 +8,14 @@ from django.db.models import QuerySet
 from rest_framework import filters, status, viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Conversation, Message
-from .serializers import ConversationSerializer, MessageSerializer
+from .serializers import (
+    ConversationSerializer,
+    CustomTokenSerializer,
+    MessageSerializer,
+)
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -98,3 +103,16 @@ class MessageViewSet(viewsets.ModelViewSet):
             {"detail": "Conversation ID is required."},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class CustomTokenView(TokenObtainPairView):
+    """
+    Custom Token Obtain Pair View to handle token generation.
+    This view can be extended to include additional fields or logic.
+    """
+
+    serializer_class = CustomTokenSerializer
+    # Remove authentication and permission classes to allow unauthenticated access
+    # This is necessary because this endpoint is used to authenticate users
+    authentication_classes = []
+    permission_classes = []

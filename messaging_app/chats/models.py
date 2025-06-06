@@ -6,10 +6,43 @@ including the structure of the database tables.
 
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
 # Create your models here.
+
+
+class UserManager(BaseUserManager):
+    """
+    Custom manager for the User model.
+    This manager provides methods to create users and superusers.
+    """
+
+    def create_user(self, email: str, password: str = None, **extra_fields):
+        '""Create and return a user with an email and password."""'
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email: str, password: str = None, **extra_fields):
+        """cteate a superuser with the given email and password"""
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if not password:
+            raise ValueError("Superusers must have a password")
+        return self.create_user(email, password, **extra_fields)
+
+    def get_by_natural_key(self, email: str):
+        """Get a user by their natural key (email).
+        This method is used to retrieve a user instance based on their email address."""
+        return self.get(email=email)
+
+
 class User(AbstractBaseUser):
     """
     Model representing a user in the messaging application.
@@ -51,6 +84,7 @@ class User(AbstractBaseUser):
         help_text="Phone number of the user",
     )
 
+    objects = UserManager()
     USERNAME_FIELD = "email"
 
     def __str__(self):
@@ -84,6 +118,8 @@ class Message(models.Model):
     """
     Model representing a message in a conversation.
     """
+
+    objects = models.Manager()
 
     message_id = models.UUIDField(
         primary_key=True,

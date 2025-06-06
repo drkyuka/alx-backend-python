@@ -20,6 +20,8 @@ django = "*"
 djangorestframework = "*"
 pygments = "*"
 django-rest-framework-nested = "*"
+djangorestframework-simplejwt = "*"
+httpie = "*"
 
 [dev-packages]
 
