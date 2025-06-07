@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Conversation, Message
-from .permissions import IsActiveUser, IsConversationParticipant
+from .permissions import CanAccessMessages, IsActiveUser, IsConversationParticipant
 from .serializers import (
     ConversationSerializer,
     CustomTokenSerializer,
@@ -68,20 +68,43 @@ class MessageViewSet(viewsets.ModelViewSet):
     search_fields = ["message_body", "sender__email", "receiver__email"]
     ordering_fields = ["sent_at", "created_at"]
 
-    # Add permission classes to ensure only participants can access messages
-    permission_classes = [IsActiveUser, IsConversationParticipant]
+    # Add permission classes based on the endpoint
+    def get_permissions(self):
+        """
+        Set different permissions based on the route.
+        - For nested routes under conversations, use IsConversationParticipant
+        - For direct message access, use CanAccessMessages
+        """
+        if self.kwargs.get("conversation_pk"):
+            # This is a nested route under a conversation
+            return [IsActiveUser(), IsConversationParticipant()]
+        else:
+            # This is the direct messages endpoint
+            return [IsActiveUser(), CanAccessMessages()]
 
     def get_queryset(self) -> QuerySet[Message]:
         """
         Override to filter messages based on the conversation parameter.
         """
-        queryset = self.queryset
+        user = self.request.user
+        if not user.is_authenticated or not user.is_active:
+            return Message.objects.none()
+
+        # For direct message access, return all messages from conversations the user is part of
+        if not self.kwargs.get("conversation_pk"):
+            # Get all conversations the user is part of
+            conversations = Conversation.objects.filter(participants=user)
+            if not conversations.exists():
+                return Message.objects.none()
+
+            # Return all messages from those conversations
+            return Message.objects.filter(conversation__in=conversations).distinct()
+
+        # For nested routes under a conversation, filter by the conversation ID
         conversation_id = self.kwargs.get("conversation_pk")
-
-        if conversation_id:
-            queryset = queryset.filter(conversation__conversation_id=conversation_id)
-
-        return queryset
+        return Message.objects.filter(
+            conversation__conversation_id=conversation_id
+        ).distinct()
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """

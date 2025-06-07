@@ -69,3 +69,41 @@ class IsConversationParticipant(permissions.BasePermission):
 
         # For PUT, PATCH, DELETE, the user must be the sender of the message
         return obj.sender.user_id == request.user.user_id
+
+
+class CanAccessMessages(permissions.BasePermission):
+    """
+    Permission class for the global message endpoint.
+    Allows a user to:
+    - See all messages from conversations they're part of via the global messages endpoint
+    - Update/delete only their own messages via the global messages endpoint
+    """
+
+    def has_permission(self, request, view):
+        """
+        Check if the user is authenticated and active.
+        The filtering of messages is handled in the get_queryset method.
+        """
+        return request.user and request.user.is_authenticated and request.user.is_active
+
+    def has_object_permission(self, request, view, obj):
+        """
+        Check if the user has permission to access a specific message.
+        User must be a participant in the conversation the message belongs to.
+        For modifications, user must be the sender of the message.
+        """
+        # Check if user is a participant in the conversation
+        conversation = obj.conversation
+        user_is_participant = conversation.participants.filter(
+            user_id=request.user.user_id
+        ).exists()
+
+        if not user_is_participant:
+            return False
+
+        # For GET requests, being a participant is enough
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # For PUT, PATCH, DELETE, the user must be the sender of the message
+        return obj.sender.user_id == request.user.user_id

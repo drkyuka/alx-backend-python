@@ -1,5 +1,5 @@
 """
-Test cases for the chats application.
+Unit tests for the permission classes in the chats application.
 """
 
 from django.urls import reverse
@@ -194,7 +194,7 @@ class PermissionTests(APITestCase):
                     "pk": self.message1.message_id,
                 },
             ),
-            {"content": "Updated message 1", "receiver": str(self.user2.user_id)},
+            {"content": "Updated message 1"},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -207,10 +207,7 @@ class PermissionTests(APITestCase):
                     "pk": self.message1.message_id,
                 },
             ),
-            {
-                "content": "User2 trying to update message 1",
-                "receiver": str(self.user1.user_id),
-            },
+            {"content": "User2 trying to update message 1"},
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 

@@ -48,6 +48,8 @@ class User(AbstractBaseUser):
     Model representing a user in the messaging application.
     """
 
+    objects = models.Manager()
+
     user_id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -99,6 +101,8 @@ class Conversation(models.Model):
     """
     Model representing a conversation between users.
     """
+
+    objects = models.Manager()
 
     conversation_id = models.UUIDField(
         primary_key=True,
