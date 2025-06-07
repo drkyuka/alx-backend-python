@@ -5,12 +5,16 @@ This file contains the ViewSets for the chats application.
 from typing import Any
 
 from django.db.models import QuerySet
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import IsAuthenticated
 
+from .conversation_filters import ConversationFilter
+from .filters import MessageFilter
 from .models import Conversation, Message
 from .permissions import CanAccessMessages, IsActiveUser, IsConversationParticipant
 from .serializers import (
@@ -29,7 +33,12 @@ class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated, IsActiveUser]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = ConversationFilter
     search_fields = [
         "participants__email",
         "participants__first_name",
@@ -55,6 +64,16 @@ class ConversationViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class MessageSetPagination(PageNumberPagination):
+    """
+    Custom pagination class for messages.
+    This can be used to limit the number of messages returned in a single request.
+    """
+
+    page_size = 20  # Default number of messages per page
+    page_size_query_param = "page_size"
+
+
 class MessageViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing messages.
@@ -65,10 +84,16 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().distinct()
 
     serializer_class = MessageSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = MessageFilter
     search_fields = ["message_body", "sender__email", "receiver__email"]
     ordering_fields = ["sent_at", "created_at"]
     permission_classes = [IsAuthenticated]
+    pagination_class = MessageSetPagination
 
     # Add permission classes based on the endpoint
     def get_permissions(self):
@@ -84,7 +109,7 @@ class MessageViewSet(viewsets.ModelViewSet):
             # This is the direct messages endpoint
             return [IsActiveUser(), CanAccessMessages()]
 
-    def get_queryset(self) -> QuerySet[Message]:
+    def get_queryset(self):
         """
         Override to filter messages based on the conversation parameter.
         """

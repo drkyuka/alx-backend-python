@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_filters",
     "rest_framework",  # djangorestframework
     "rest_framework.authtoken",  # djangorestframework.authtoken
     "rest_framework_simplejwt",  # djangorestframework_simplejwt
@@ -55,6 +56,9 @@ REST_FRAMEWORK = {
         "chats.permissions.IsActiveUser",  # Custom permission to check if user is active
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 20,  # Default page size for pagination
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 
 MIDDLEWARE = [
