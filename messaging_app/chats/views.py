@@ -7,7 +7,6 @@ from typing import Any
 from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -22,6 +21,7 @@ from .serializers import (
     CustomTokenSerializer,
     MessageSerializer,
 )
+from .pagination import MessageSetPagination
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -62,16 +62,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class MessageSetPagination(PageNumberPagination):
-    """
-    Custom pagination class for messages.
-    This can be used to limit the number of messages returned in a single request.
-    """
-
-    page_size = 20  # Default number of messages per page
-    page_size_query_param = "page_size"
 
 
 class MessageViewSet(viewsets.ModelViewSet):
