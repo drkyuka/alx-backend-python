@@ -9,6 +9,7 @@ from rest_framework import filters, status, viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Conversation, Message
 from .permissions import CanAccessMessages, IsActiveUser, IsConversationParticipant
@@ -27,7 +28,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [IsActiveUser]
+    permission_classes = [IsAuthenticated, IsActiveUser]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = [
         "participants__email",
@@ -67,6 +68,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["message_body", "sender__email", "receiver__email"]
     ordering_fields = ["sent_at", "created_at"]
+    permission_classes = [IsAuthenticated]
 
     # Add permission classes based on the endpoint
     def get_permissions(self):
