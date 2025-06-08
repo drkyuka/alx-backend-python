@@ -123,3 +123,30 @@ class OffensiveLanguageMiddleware:
                 )
 
         return self.get_response(request)
+
+
+class RolepermissionMiddleware:
+    """
+    Middleware to check the user’s role i.e admin,
+    before allowing access to specific actions
+    """
+
+    def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]):
+        """
+        Initiatilize the middleware with the get_response callable.
+        """
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest) -> HttpResponse:
+        """
+        Middleware that checks if the user has the required role to access a view.
+        """
+        # Get the user role from the request
+        user = request.user
+        user_role = request.META.get("HTTP_X_USER_ROLE")
+        if not user.is_authenticated or not user_role not in ["admin", "moderator"]:
+            return HttpResponseForbidden(
+                "You do not have permission to access this resource."
+            )
+
+        return self.get_response(request)
