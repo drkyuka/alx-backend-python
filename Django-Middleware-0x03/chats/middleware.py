@@ -5,6 +5,7 @@ Django Middleware to log request method and path§
 import logging
 import os
 from datetime import datetime
+from django.http import HttpResponseForbidden
 
 
 class RequestLoggingMiddleware:
@@ -48,3 +49,28 @@ class RequestLoggingMiddleware:
         response = self.get_response(request)
 
         return response
+
+
+class RestrictAccessByTimeMiddleware:
+    """
+    Middleware that restricts access to the messaging up during
+    certain hours of the day
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        """
+        Middleware that restricts access to the messaging app
+        during certain hours of the day.
+        """
+
+        # Check if the current time is within business hours (9 AM to 6 PM)
+        if 9 <= datetime.now().hour < 18:
+            # Allow access during business hours (9 AM to 5 PM)
+            return self.get_response(request)
+
+        return HttpResponseForbidden(
+            "Access to the messaging app is restricted outside business hours (9 AM to 6 PM)."
+        )

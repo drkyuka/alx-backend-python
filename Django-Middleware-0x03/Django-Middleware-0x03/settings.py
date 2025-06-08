@@ -67,9 +67,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "chats.middleware.RequestLoggingMiddleware",  # Custom middleware for logging requests
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "chats.middleware.RequestLoggingMiddleware",  # Custom middleware for logging requests
+    "chats.middleware.RestrictAccessMiddleware",  # Custom middleware to restrict access during certain hours
 ]
 
 ROOT_URLCONF = "Django-Middleware-0x03.urls"
