@@ -70,7 +70,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "chats.middleware.RequestLoggingMiddleware",  # Custom middleware for logging requests
-    "chats.middleware.RestrictAccessMiddleware",  # Custom middleware to restrict access during certain hours
+    "chats.middleware.RestrictAccessByTimeMiddleware",  # Custom middleware to restrict access during certain hours
 ]
 
 ROOT_URLCONF = "Django-Middleware-0x03.urls"
