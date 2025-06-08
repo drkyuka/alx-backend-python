@@ -144,7 +144,7 @@ class RolepermissionMiddleware:
         # Get the user role from the request
         user = request.user
         user_role = request.META.get("HTTP_X_USER_ROLE")
-        if not user.is_authenticated or not user_role not in ["admin", "moderator"]:
+        if not user.is_authenticated or user_role not in ["admin", "moderator"]:
             return HttpResponseForbidden(
                 "You do not have permission to access this resource."
             )
