@@ -2,8 +2,6 @@
 Django Middleware to log request method and path§
 """
 
-from email import message
-import http
 import logging
 import os
 from datetime import datetime

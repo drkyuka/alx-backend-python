@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "chats.middleware.RequestLoggingMiddleware",  # Custom middleware for logging requests
     "chats.middleware.RestrictAccessByTimeMiddleware",  # Custom middleware to restrict access during certain hours
-    "chats.middleware.OffensiveLanguageFilterMiddleware",  # Custom middleware to filter offensive language
+    "chats.middleware.OffensiveLanguageMiddleware",  # Custom middleware to filter offensive language
 ]
 
 ROOT_URLCONF = "Django-Middleware-0x03.urls"
