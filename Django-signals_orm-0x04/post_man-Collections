@@ -1,0 +1,606 @@
+
+{
+  "info": {
+    "name": "Messaging App API Tests",
+    "_postman_id": "YOUR_COLLECTION_ID",
+    "description": "Postman collection for testing the Django Messaging App API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and token management.",
+      "item": [
+        {
+          "name": "Login User 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Access token received\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.access).to.not.be.empty;",
+                  "    pm.collectionVariables.set(\"user1_access_token\", jsonData.access);",
+                  "    pm.collectionVariables.set(\"user1_refresh_token\", jsonData.refresh);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{user1_email}}\",\n    \"password\": \"{{user1_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/token/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "token",
+                ""
+              ]
+            },
+            "description": "Logs in User 1 and stores the access and refresh tokens."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token User 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"New access token received\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.access).to.not.be.empty;",
+                  "    pm.collectionVariables.set(\"user1_access_token\", jsonData.access);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh\": \"{{user1_refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/token/refresh/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "token",
+                "refresh",
+                ""
+              ]
+            },
+            "description": "Refreshes User 1's access token."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Access token received for User 2\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.access).to.not.be.empty;",
+                  "    pm.collectionVariables.set(\"user2_access_token\", jsonData.access);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{user2_email}}\",\n    \"password\": \"{{user2_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/token/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "token",
+                ""
+              ]
+            },
+            "description": "Logs in User 2 and stores the access token. Used for authorization tests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Conversations",
+      "description": "Manage conversations.",
+      "item": [
+        {
+          "name": "Create Conversation (User 1 with User 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Conversation ID received\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.conversation_id).to.not.be.empty;",
+                  "    pm.collectionVariables.set(\"created_conversation_id\", jsonData.conversation_id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"participant_ids\": [\"{{user1_id_placeholder}}\", \"{{user2_id_placeholder}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/conversations/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "conversations",
+                ""
+              ]
+            },
+            "description": "Creates a new conversation between User 1 and User 2. Assumes User 1 is authenticated and their ID is user1_id_placeholder."
+          },
+          "response": []
+        },
+        {
+          "name": "List My Conversations (User 1)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/conversations/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "conversations",
+                ""
+              ]
+            },
+            "description": "Lists all conversations for the authenticated User 1."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Conversation (User 1)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/conversations/{{created_conversation_id}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "conversations",
+                "{{created_conversation_id}}",
+                ""
+              ]
+            },
+            "description": "Retrieves details of a specific conversation created earlier."
+          },
+          "response": []
+        },
+        {
+          "name": "List Conversations with specific_participants filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/conversations/?specific_participants={{user1_id_placeholder}},{{user2_id_placeholder}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "conversations", "" ],
+              "query": [
+                { "key": "specific_participants", "value": "{{user1_id_placeholder}},{{user2_id_placeholder}}" }
+              ]
+            },
+            "description": "Lists conversations involving exactly User 1 and User 2."
+          },
+          "response": []
+        },
+        {
+          "name": "List Conversations with participant filter (User 1)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/conversations/?participant={{user1_id_placeholder}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "conversations", "" ],
+              "query": [
+                { "key": "participant", "value": "{{user1_id_placeholder}}" }
+              ]
+            },
+            "description": "Lists conversations where User 1 is a participant."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "description": "Send and retrieve messages.",
+      "item": [
+        {
+          "name": "Send Message (User 1 in created conversation)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"Hello from Postman! This is a test message.\",\n    \"receiver\": \"{{user2_id_placeholder}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/conversations/{{created_conversation_id}}/messages/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "conversations",
+                "{{created_conversation_id}}",
+                "messages",
+                ""
+              ]
+            },
+            "description": "User 1 sends a message to the conversation created earlier."
+          },
+          "response": []
+        },
+        {
+          "name": "List Messages in Conversation (User 1)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/conversations/{{created_conversation_id}}/messages/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "conversations",
+                "{{created_conversation_id}}",
+                "messages",
+                ""
+              ],
+              "query": [
+                { "key": "sent_after", "value": "2023-01-01T00:00:00Z", "disabled": true },
+                { "key": "sent_before", "value": "2024-12-31T23:59:59Z", "disabled": true },
+                { "key": "content", "value": "Hello", "disabled": true }
+              ]
+            },
+            "description": "Lists messages for the specific conversation. Enable query params to test filters."
+          },
+          "response": []
+        },
+        {
+          "name": "List All Messages (Global endpoint)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages/",
+              "host": [ "{{base_url}}" ],
+              "path": [ "messages", "" ]
+            },
+            "description": "Lists all messages from conversations where User 1 is a participant."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Messages - Content Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages/?content=Hello",
+              "host": [ "{{base_url}}" ],
+              "path": [ "messages", "" ],
+              "query": [
+                { "key": "content", "value": "Hello" }
+              ]
+            },
+            "description": "Search messages containing 'Hello' in the content."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Messages - Date Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages/?sent_after=2025-06-01T00:00:00Z&sent_before=2025-12-31T23:59:59Z",
+              "host": [ "{{base_url}}" ],
+              "path": [ "messages", "" ],
+              "query": [
+                { "key": "sent_after", "value": "2025-06-01T00:00:00Z" },
+                { "key": "sent_before", "value": "2025-12-31T23:59:59Z" }
+              ]
+            },
+            "description": "Filter messages sent within a specific date range."
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Messages - By Sender",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages/?sender={{user1_id_placeholder}}",
+              "host": [ "{{base_url}}" ],
+              "path": [ "messages", "" ],
+              "query": [
+                { "key": "sender", "value": "{{user1_id_placeholder}}" }
+              ]
+            },
+            "description": "Filter messages sent by User 1."
+          },
+          "response": []
+        },
+        {
+          "name": "Search Messages - Global Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user1_access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages/?search=Postman",
+              "host": [ "{{base_url}}" ],
+              "path": [ "messages", "" ],
+              "query": [
+                { "key": "search", "value": "Postman" }
+              ]
+            },
+            "description": "Global search across message content and sender/receiver emails for 'Postman'."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+        "name": "Authorization Tests",
+        "description": "Tests for unauthorized access.",
+        "item": [
+            {
+                "name": "FAIL - User 2 Tries to List Messages in User 1's Conversation",
+                "event": [
+                    {
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test(\"Status code is 403 (Forbidden) or 404 (Not Found)\", function () {",
+                                "    pm.expect(pm.response.code).to.be.oneOf([403, 404]);",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }
+                ],
+                "request": {
+                    "method": "GET",
+                    "header": [
+                        {
+                            "key": "Authorization",
+                            "value": "Bearer {{user2_access_token}}"
+                        }
+                    ],
+                    "url": {
+                        "raw": "{{base_url}}/conversations/{{created_conversation_id}}/messages/",
+                        "host": [ "{{base_url}}" ],
+                        "path": [ "conversations", "{{created_conversation_id}}", "messages", "" ]
+                    },
+                    "description": "User 2 (authenticated) attempts to list messages from a conversation they are not part of (created by User 1). Expect 403 or 404."
+                },
+                "response": []
+            },
+            {
+                "name": "FAIL - Unauthenticated User Tries to List Conversations",
+                 "event": [
+                    {
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                "    pm.response.to.have.status(401);",
+                                "});"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }
+                ],
+                "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                        "raw": "{{base_url}}/conversations/",
+                        "host": [ "{{base_url}}" ],
+                        "path": [ "conversations", "" ]
+                    },
+                    "description": "An unauthenticated user attempts to list conversations. Expect 401."
+                },
+                "response": []
+            }
+        ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8001/api"
+    },
+    {
+      "key": "user1_email",
+      "value": "user1@example.com",
+      "description": "Email/Username for User 1. Ensure this user exists."
+    },
+    {
+      "key": "user1_password",
+      "value": "test@123",
+      "description": "Password for User 1."
+    },
+    {
+      "key": "user2_email",
+      "value": "user2@example.com",
+      "description": "Email/Username for User 2. Ensure this user exists."
+    },
+    {
+      "key": "user2_password",
+      "value": "test@123",
+      "description": "Password for User 2."
+    },
+    {
+      "key": "user1_id_placeholder",
+      "value": "f6d499dd-245a-4c30-b771-6211aac57f53",
+      "description": "Actual DB ID of User 1. **Update this value.**"
+    },
+    {
+      "key": "user2_id_placeholder",
+      "value": "6bc2ac7b-2894-4013-885b-6799f89edbe9",
+      "description": "Actual DB ID of User 2. **Update this value.**"
+    },
+    {
+      "key": "user1_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user1_refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user2_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "created_conversation_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
