@@ -40,15 +40,18 @@ def log_message_edit(sender, instance, **kwargs):
         if old.content != instance.content:
             # Log the edit
 
+            # update the instance edited field
+            instance.edited = True
+
             # Create a history entry for the edited message
             _message_history = MessageHistory.objects.create(
                 message=instance,
-                edited_content=instance.content,
+                edited_content=old.content,
                 edited_by=instance.sender,
             )
 
             _message_history.save()
 
             print(
-                f"Message {_message_history.history_id} edited from '{_message_history.content}' to '{instance.content}'"
+                f"Message history {_message_history.history_id} edited from '{_message_history.edited_content}' to '{instance.content}'"
             )
