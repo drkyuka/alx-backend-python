@@ -12,3 +12,8 @@ class MessagingConfig(AppConfig):
 
     default_auto_field = "django.db.models.BigAutoField"
     name = "messaging"
+
+    def ready(self):
+        """Ready method to perform any startup tasks."""
+        # Import signals to ensure they are registered
+        import messaging.signals
