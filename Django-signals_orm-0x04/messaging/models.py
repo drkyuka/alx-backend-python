@@ -9,6 +9,11 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+edited_field = models.BooleanField(
+    default=False,
+    help_text="Indicates whether the message has been edited",
+)
+
 Message = type(
     "Message",
     (models.Model,),
@@ -34,11 +39,13 @@ Message = type(
         ),
         "content": models.TextField(
             help_text="Content of the message",
+            editable=True,  # Allow editing of message content
         ),
         "timestamp": models.DateTimeField(
             auto_now_add=True,
             help_text="Timestamp when the message was sent",
         ),
+        "edited": edited_field,  # checks if message was edited
         "Meta": type(
             "Meta",
             (),
@@ -52,8 +59,6 @@ Message = type(
         "__str__": lambda self: f"Message {self.message_id} from {self.sender} to {self.recipient}",
     },
 )
-
-# Assuming Notification model is defined in the same module
 
 
 class Notification(models.Model):
@@ -96,6 +101,51 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification {self.notification_id} for {self.recipient}"
+
+
+MessageHistory = type(
+    "MessageHistory",
+    (models.Model,),
+    {
+        "history_id": models.UUIDField(
+            primary_key=True,
+            default=uuid4,
+            editable=False,
+            unique=True,
+            help_text="Unique identifier for the message history entry",
+        ),
+        "message": models.ForeignKey(
+            Message,
+            related_name="history",
+            on_delete=models.CASCADE,
+            help_text="Message that was edited",
+        ),
+        "edited_content": models.TextField(
+            help_text="Content of the message after editing",
+        ),
+        "edited_at": models.DateTimeField(
+            auto_now_add=True,
+            help_text="Timestamp when the message was edited",
+        ),
+        "edited_by": models.ForeignKey(
+            User,
+            related_name="messaging_edited_messages",
+            on_delete=models.CASCADE,
+            help_text="User who edited the message",
+        ),
+        "Meta": type(
+            "Meta",
+            (),
+            {
+                "db_table": "messaging_message_history",
+                "verbose_name": "Message History",
+                "verbose_name_plural": "Message Histories",
+            },
+        ),
+        "__module__": __name__,
+        "__str__": lambda self: f"History for {self.message.message_id} edited at {self.edited_at}",
+    },
+)
 
 
 @receiver(post_save, sender=Message)
