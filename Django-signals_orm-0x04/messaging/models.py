@@ -6,6 +6,8 @@ from uuid import uuid4
 
 from chats.models import User  # Assuming User model is defined in chat.models
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 Message = type(
     "Message",
@@ -97,3 +99,25 @@ Notification = type(
         "__str__": lambda self: f"Notification {self.notification_id} for {self.recipient}",
     },
 )
+
+
+@receiver(post_save, sender=Message)
+def notify_users(sender, instance, created, **kwargs):
+    """Signal handler to notify users when a message is sent."""
+    _ = kwargs  # Mark kwargs as used to avoid unused argument warning
+    if created:
+        # Logic to notify users about the new message
+        print(
+            f"New message sent: {instance.content} from {instance.sender} to {instance.recipient}"
+        )
+
+        # Here you can implement actual notification logic, e.g., sending an email or a push notification
+        notification = Notification.objects.create(
+            message=instance,
+            recipient=instance.recipient,
+        )
+
+        notification.save()
+        print(
+            f"Notification created: {notification.notification_id} for {instance.recipient}"
+        )
