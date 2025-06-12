@@ -16,12 +16,13 @@ def create_notification(sender, instance, created, **kwargs):
 
     if created:
         # Create a notification for the recipient
-        Notification.objects.create(
+        notification = Notification.objects.create(
             recipient=instance.recipient,
             message=instance,
         )
 
+        notification.save()
         # Print a message to indicate the signal was triggered
         print(
-            f"New message sent: {instance.content} from {instance.sender} to {instance.recipient}"
+            f"Notification created: {notification.notification_id} for {notification.recipient}"
         )

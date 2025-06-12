@@ -98,52 +98,6 @@ class Notification(models.Model):
         return f"Notification {self.notification_id} for {self.recipient}"
 
 
-# Notification = type(
-#     "Notification",
-#     (models.Model,),
-#     {
-#         "notification_id": models.UUIDField(
-#             primary_key=True,
-#             default=uuid4,
-#             editable=False,
-#             unique=True,
-#             help_text="Unique identifier for the notification",
-#         ),
-#         "message": models.ForeignKey(
-#             Message,
-#             related_name="notifications",
-#             on_delete=models.CASCADE,
-#             help_text="Message associated with the notification",
-#         ),
-#         "recipient": models.ForeignKey(
-#             User,
-#             related_name="messaging_notifications",
-#             on_delete=models.CASCADE,
-#             help_text="User who will receive the notification",
-#         ),
-#         "is_read": models.BooleanField(
-#             default=False,
-#             help_text="Indicates whether the notification has been read",
-#         ),
-#         "timestamp": models.DateTimeField(
-#             auto_now_add=True,
-#             help_text="Timestamp when the notification was created",
-#         ),
-#         "Meta": type(
-#             "Meta",
-#             (),
-#             {
-#                 "db_table": "messaging_notification",
-#                 "verbose_name": "Notification",
-#                 "verbose_name_plural": "Notifications",
-#             },
-#         ),
-#         "__module__": __name__,
-#         "__str__": lambda self: f"Notification {self.notification_id} for {self.recipient}",
-#     },
-# )
-
-
 @receiver(post_save, sender=Message)
 def new_message_created(sender, instance, created, **kwargs):
     """Signal handler to notify users when a message is sent."""
