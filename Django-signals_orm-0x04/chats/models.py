@@ -6,164 +6,132 @@ including the structure of the database tables.
 
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser
 
 
-# Create your models here.
+# Extend user_id field to the User model
+user_id_field = models.UUIDField(
+    default=uuid.uuid4,
+    editable=False,
+    unique=True,
+    help_text="Unique identifier for the user",
+)
+
+# Extend email field to the User model
+email_field = models.EmailField(
+    unique=True,
+)
+
+# create the User model using functional approach
+User = type(
+    "User",
+    (AbstractUser,),
+    {
+        "user_id": user_id_field,
+        "email": email_field,
+        "USERNAME_FIELD": "email",
+        "REQUIRED_FIELDS": [],
+        "Meta": type(
+            "Meta",
+            (),
+            {
+                "db_table": "user",
+                "verbose_name": "User",
+                "verbose_name_plural": "Users",
+            },
+        ),
+        "__module__": __name__,
+        "__str__": lambda self: f"{self.user_id} - {self.email}",
+    },
+)
 
 
-class UserManager(BaseUserManager):
-    """
-    Custom manager for the User model.
-    This manager provides methods to create users and superusers.
-    """
+# dynamically create the Message model using functional approach
 
-    def create_user(self, email: str, password: str = None, **extra_fields):
-        '""Create and return a user with an email and password."""'
-        if not email:
-            raise ValueError("The Email field must be set")
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email: str, password: str = None, **extra_fields):
-        """cteate a superuser with the given email and password"""
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-
-        if not password:
-            raise ValueError("Superusers must have a password")
-        return self.create_user(email, password, **extra_fields)
-
-    def get_by_natural_key(self, email: str):
-        """Get a user by their natural key (email).
-        This method is used to retrieve a user instance based on their email address."""
-        return self.get(email=email)
-
-
-class User(AbstractBaseUser):
-    """
-    Model representing a user in the messaging application.
-    """
-
-    objects = models.Manager()
-
-    user_id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-        help_text="Unique identifier for the user",
-    )
-
-    email = models.EmailField(
-        max_length=254,
-        unique=True,
-        help_text="Email address of the user",
-    )
-
-    password = models.CharField(
-        max_length=128,
-        help_text="Password for the user account",
-    )
-
-    first_name = models.CharField(
-        max_length=30,
-        blank=False,
-        help_text="First name of the user",
-    )
-
-    last_name = models.CharField(
-        max_length=30,
-        blank=False,
-        help_text="Last name of the user",
-    )
-
-    phone_number = models.CharField(
-        max_length=15,
-        help_text="Phone number of the user",
-    )
-
-    objects = UserManager()
-    USERNAME_FIELD = "email"
-
-    def __str__(self):
-        """
-        String representation of the User model.
-        Returns the email address of the user.
-        """
-        return f"{self.first_name} {self.last_name} <{self.email}>"
+Conversation = type(
+    "Conversation",
+    (models.Model,),
+    {
+        "conversations": models.Manager(),
+        "conversation_id": models.UUIDField(
+            primary_key=True,
+            default=uuid.uuid4,
+            editable=False,
+            unique=True,
+            help_text="Unique identifier for the conversation",
+        ),
+        "participants": models.ManyToManyField(
+            to=User,
+            help_text="Users participating in the conversation",
+        ),
+        "Meta": type(
+            "Meta",
+            (object,),
+            {
+                "db_table": "conversation",
+                "verbose_name": "Conversation",
+                "verbose_name_plural": "Conversations",
+            },
+        ),
+        "__module__": __name__,
+        "__str__": lambda self: f"Conversation {self.conversation_id} with {self.participants.count()} participants",
+    },
+)
 
 
-class Conversation(models.Model):
-    """
-    Model representing a conversation between users.
-    """
+# creating the Message model using functional approach
 
-    objects = models.Manager()
-
-    conversation_id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-        help_text="Unique identifier for the conversation",
-    )
-
-    participants = models.ManyToManyField(
-        to=User,
-        help_text="Users participating in the conversation",
-    )
-
-
-class Message(models.Model):
-    """
-    Model representing a message in a conversation.
-    """
-
-    objects = models.Manager()
-
-    message_id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-        help_text="Unique identifier for the message",
-    )
-
-    message_body = models.TextField(
-        help_text="Content of the message",
-    )
-
-    conversation = models.ForeignKey(
-        Conversation,
-        related_name="messages",
-        on_delete=models.CASCADE,
-        help_text="Conversation to which the message belongs",
-    )
-
-    sender = models.ForeignKey(
-        User,
-        related_name="sent_messages",
-        on_delete=models.CASCADE,
-        help_text="User who sent the message",
-    )
-
-    receiver = models.ForeignKey(
-        User,
-        related_name="received_messages",
-        on_delete=models.CASCADE,
-        help_text="User who received the message",
-    )
-
-    sent_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Timestamp when the message was sent",
-    )
-
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Timestamp when the message was created",
-    )
+Message = type(
+    "Message",
+    (models.Model,),
+    {
+        "messages": models.Manager(),
+        "message_id": models.UUIDField(
+            primary_key=True,
+            default=uuid.uuid4,
+            editable=False,
+            unique=True,
+            help_text="Unique identifier for the message",
+        ),
+        "message_body": models.TextField(
+            help_text="Content of the message",
+        ),
+        "conversation": models.ForeignKey(
+            Conversation,
+            related_name="messages",
+            on_delete=models.CASCADE,
+            help_text="Conversation to which the message belongs",
+        ),
+        "sender": models.ForeignKey(
+            User,
+            related_name="sent_messages",
+            on_delete=models.CASCADE,
+            help_text="User who sent the message",
+        ),
+        "receiver": models.ForeignKey(
+            User,
+            related_name="received_messages",
+            on_delete=models.CASCADE,
+            help_text="User who received the message",
+        ),
+        "sent_at": models.DateTimeField(
+            auto_now_add=True,
+            help_text="Timestamp when the message was sent",
+        ),
+        "created_at": models.DateTimeField(
+            auto_now_add=True,
+            help_text="Timestamp when the message was created",
+        ),
+        "Meta": type(
+            "Meta",
+            (object,),
+            {
+                "db_table": "message",
+                "verbose_name": "Message",
+                "verbose_name_plural": "Messages",
+            },
+        ),
+        "__module__": __name__,
+        "__str__": lambda self: f"Message {self.message_id} from {self.sender} to {self.receiver}",
+    },
+)

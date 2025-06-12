@@ -30,7 +30,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     Provides CRUD operations for Conversation model.
     """
 
-    queryset = Conversation.objects.all()
+    queryset = Conversation.conversations.all()
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated, IsActiveUser]
     filter_backends = [
@@ -71,7 +71,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     """
 
     # Get all messages - permissions will filter access
-    queryset = Message.objects.all().distinct()
+    queryset = Message.messages.all()
 
     serializer_class = MessageSerializer
     filter_backends = [
@@ -105,21 +105,21 @@ class MessageViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         if not user.is_authenticated or not user.is_active:
-            return Message.objects.none()
+            return Message.messages.none()
 
         # For direct message access, return all messages from conversations the user is part of
         if not self.kwargs.get("conversation_pk"):
             # Get all conversations the user is part of
             conversations = Conversation.objects.filter(participants=user)
             if not conversations.exists():
-                return Message.objects.none()
+                return Message.messages.none()
 
             # Return all messages from those conversations
-            return Message.objects.filter(conversation__in=conversations).distinct()
+            return Message.messages.filter(conversation__in=conversations).distinct()
 
         # For nested routes under a conversation, filter by the conversation ID
         conversation_id = self.kwargs.get("conversation_pk")
-        return Message.objects.filter(
+        return Message.messages.filter(
             conversation__conversation_id=conversation_id
         ).distinct()
 

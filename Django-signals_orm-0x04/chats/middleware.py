@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import Callable
 from django.http import HttpResponseForbidden, HttpRequest, HttpResponse
 
-
 RESTRICTED_TIME_START = 9  # 9 AM
 RESTRICTED_TIME_END = 18  # 6 PM
 MESSAGE_LIMIT = 5  # Example limit for messages

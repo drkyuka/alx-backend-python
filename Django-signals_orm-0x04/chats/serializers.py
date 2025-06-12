@@ -13,12 +13,36 @@ from .models import Conversation, Message, User
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the User model."""
 
+    password = serializers.CharField(write_only=True, required=False)
+
     class Meta:
         """Meta class for UserSerializer."""
 
         model = User
         fields = "__all__"
         read_only_fields = ("user_id",)
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
+
+    def create(self, validated_data):
+        """Create user with encrypted password."""
+        password = validated_data.pop("password", None)
+        user = User(**validated_data)
+        if password:
+            user.set_password(password)
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        """Update user with encrypted password."""
+        password = validated_data.pop("password", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -43,16 +67,7 @@ class MessageSerializer(serializers.ModelSerializer):
         """Meta class for MessageSerializer."""
 
         model = Message
-        fields = [
-            "message_id",
-            "content",
-            "conversation",
-            "sender",
-            "receiver",
-            "sent_at",
-            "created_at",
-            "message_count",
-        ]
+        fields = "__all__"
         read_only_fields = ("message_id",)
         extra_kwargs = {
             "sender": {"required": True},
@@ -61,7 +76,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def get_message_count(self, obj) -> int:
         """Get the count of messages in the conversation."""
-        return obj.conversation.messages.count()
+        return Message.messages.filter(conversation=obj.conversation).count()
 
     def validate(self, attrs):
         """Validate the message content and check sender/receiver."""
@@ -134,7 +149,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create a new conversation with participants."""
         participant_ids = validated_data.pop("participant_ids", [])
-        conversation = Conversation.objects.create(**validated_data)
+        conversation = Conversation.conversations.create(**validated_data)
 
         # Add participants to the conversation
         if participant_ids:

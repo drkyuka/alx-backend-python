@@ -23,6 +23,7 @@ django-rest-framework-nested = "*"
 djangorestframework-simplejwt = "*"
 httpie = "*"
 django-filter = "*"
+faker = "*"
 
 [dev-packages]
 
