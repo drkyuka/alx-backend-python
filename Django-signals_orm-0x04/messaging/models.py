@@ -55,69 +55,101 @@ Message = type(
 
 # Assuming Notification model is defined in the same module
 
-Notification = type(
-    "Notification",
-    (models.Model,),
-    {
-        "notification_id": models.UUIDField(
-            primary_key=True,
-            default=uuid4,
-            editable=False,
-            unique=True,
-            help_text="Unique identifier for the notification",
-        ),
-        "message": models.ForeignKey(
-            Message,
-            related_name="notifications",
-            on_delete=models.CASCADE,
-            help_text="Message associated with the notification",
-        ),
-        "recipient": models.ForeignKey(
-            User,
-            related_name="messaging_notifications",
-            on_delete=models.CASCADE,
-            help_text="User who will receive the notification",
-        ),
-        "is_read": models.BooleanField(
-            default=False,
-            help_text="Indicates whether the notification has been read",
-        ),
-        "timestamp": models.DateTimeField(
-            auto_now_add=True,
-            help_text="Timestamp when the notification was created",
-        ),
-        "Meta": type(
-            "Meta",
-            (),
-            {
-                "db_table": "messaging_notification",
-                "verbose_name": "Notification",
-                "verbose_name_plural": "Notifications",
-            },
-        ),
-        "__module__": __name__,
-        "__str__": lambda self: f"Notification {self.notification_id} for {self.recipient}",
-    },
-)
+
+class Notification(models.Model):
+    """Notification model to represent notifications for messages."""
+
+    notification_id = models.UUIDField(
+        primary_key=True,
+        default=uuid4,
+        editable=False,
+        unique=True,
+        help_text="Unique identifier for the notification",
+    )
+    message = models.ForeignKey(
+        Message,
+        related_name="notifications",
+        on_delete=models.CASCADE,
+        help_text="Message associated with the notification",
+    )
+    recipient = models.ForeignKey(
+        User,
+        related_name="messaging_notifications",
+        on_delete=models.CASCADE,
+        help_text="User who will receive the notification",
+    )
+    is_read = models.BooleanField(
+        default=False,
+        help_text="Indicates whether the notification has been read",
+    )
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Timestamp when the notification was created",
+    )
+
+    class Meta:
+        """Meta options for the Notification model."""
+
+        db_table = "messaging_notification"
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
+
+    def __str__(self):
+        return f"Notification {self.notification_id} for {self.recipient}"
+
+
+# Notification = type(
+#     "Notification",
+#     (models.Model,),
+#     {
+#         "notification_id": models.UUIDField(
+#             primary_key=True,
+#             default=uuid4,
+#             editable=False,
+#             unique=True,
+#             help_text="Unique identifier for the notification",
+#         ),
+#         "message": models.ForeignKey(
+#             Message,
+#             related_name="notifications",
+#             on_delete=models.CASCADE,
+#             help_text="Message associated with the notification",
+#         ),
+#         "recipient": models.ForeignKey(
+#             User,
+#             related_name="messaging_notifications",
+#             on_delete=models.CASCADE,
+#             help_text="User who will receive the notification",
+#         ),
+#         "is_read": models.BooleanField(
+#             default=False,
+#             help_text="Indicates whether the notification has been read",
+#         ),
+#         "timestamp": models.DateTimeField(
+#             auto_now_add=True,
+#             help_text="Timestamp when the notification was created",
+#         ),
+#         "Meta": type(
+#             "Meta",
+#             (),
+#             {
+#                 "db_table": "messaging_notification",
+#                 "verbose_name": "Notification",
+#                 "verbose_name_plural": "Notifications",
+#             },
+#         ),
+#         "__module__": __name__,
+#         "__str__": lambda self: f"Notification {self.notification_id} for {self.recipient}",
+#     },
+# )
 
 
 @receiver(post_save, sender=Message)
-def notify_users(sender, instance, created, **kwargs):
+def new_message_created(sender, instance, created, **kwargs):
     """Signal handler to notify users when a message is sent."""
     _ = kwargs  # Mark kwargs as used to avoid unused argument warning
     if created:
         # Logic to notify users about the new message
         print(
             f"New message sent: {instance.content} from {instance.sender} to {instance.recipient}"
-        )
-
-        # Here you can implement actual notification logic, e.g., sending an email or a push notification
-        notification = Notification.objects.create(
-            message=instance,
-            recipient=instance.recipient,
-        )
-
-        notification.save()
-        print(
-            f"Notification created: {notification.notification_id} for {instance.recipient}"
         )
