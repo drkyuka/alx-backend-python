@@ -8,24 +8,22 @@ from .models import Message
 
 
 class MessageSerializer(ModelSerializer):
-    """Serializer for the Message model with nested replies."""
+    parent_message = SerializerMethodField(method_name="get_replies")
 
-    replies = SerializerMethodField(method_name="get_replies")
+    def get_replies(self, instance):
+        """Get replies for a message instance."""
+
+        parent_message = (
+            Message.objects.filter(parent_message=instance)
+            .select_related("sender")
+            .prefetch_related("parent_message__sender", "parent_message__recipient")
+            .order_by("-timestamp")
+        )
+
+        return MessageSerializer(parent_message, many=True, context=self.context).data
 
     class Meta:
         """Meta class for MessageSerializer."""
 
         model = Message
         fields = "__all__"
-
-    def get_replies(self, instance):
-        """Retrieve nested replies for a message instance.
-        This method fetches all replies to the message, including nested replies,
-        and serializes them using the same serializer to maintain consistency."""
-
-        replies = (
-            instance.replies.select_related("sender", "recipient")
-            .prefetch_related("replies__sender", "replies__recipient")
-            .order_by("-timestamp")
-        )
-        return MessageSerializer(replies, many=True, context=self.context).data
