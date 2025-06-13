@@ -16,7 +16,7 @@ class MessageSerializer(ModelSerializer):
         parent_message = (
             Message.objects.filter(parent_message=instance)
             .select_related("sender")
-            .prefetch_related("parent_message__sender", "parent_message__recipient")
+            .prefetch_related("parent_message")
             .order_by("-timestamp")
         )
 
