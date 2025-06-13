@@ -7,6 +7,7 @@ from django.db.models.signals import (
     pre_save,
     post_delete,
 )
+from django.db.models import Q
 from django.dispatch import receiver
 from messaging.models import (
     Message,
@@ -81,4 +82,6 @@ def delete_user(sender, instance, **kwargs) -> None:
 
     # Delete the user
     # instance.delete()
+    Message.objects.filter(Q(sender=instance) | Q(recipient=instance)).delete()
+    Notification.objects.filter(recipient=instance).delete()
     print(f"User {instance.username} deleted.")
