@@ -9,11 +9,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-edited_field = models.BooleanField(
-    default=False,
-    help_text="Indicates whether the message has been edited",
-)
-
 Message = type(
     "Message",
     (models.Model,),
@@ -45,7 +40,18 @@ Message = type(
             auto_now_add=True,
             help_text="Timestamp when the message was sent",
         ),
-        "edited": edited_field,  # checks if message was edited
+        "edited": models.BooleanField(
+            default=False,
+            help_text="Indicates whether the message has been edited",
+        ),  # checks if message was edited
+        "parent_message": models.ForeignKey(
+            "self",
+            related_name="replies",
+            on_delete=models.CASCADE,
+            null=True,
+            blank=True,
+            help_text="Parent message for threaded conversations",
+        ),
         "Meta": type(
             "Meta",
             (),
