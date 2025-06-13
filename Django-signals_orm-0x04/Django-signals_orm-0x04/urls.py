@@ -22,4 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("chats.urls")),
     path("api-auth/", include("rest_framework.urls")),
+    path("messaging/", include("messaging.urls")),  # Include messaging URLs
 ]
