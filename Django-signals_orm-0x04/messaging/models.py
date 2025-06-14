@@ -9,10 +9,14 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from .managers import UnreadMessagesManager
+
 Message = type(
     "Message",
     (models.Model,),
     {
+        "unread": UnreadMessagesManager(),
+        "objects": models.Manager(),  # Default manager
         "message_id": models.UUIDField(
             primary_key=True,
             default=uuid4,
@@ -43,7 +47,11 @@ Message = type(
         "edited": models.BooleanField(
             default=False,
             help_text="Indicates whether the message has been edited",
-        ),  # checks if message was edited
+        ),
+        "read": models.BooleanField(
+            default=False,
+            help_text="Indicates whether the message has been read",
+        ),
         "parent_message": models.ForeignKey(
             "self",
             related_name="replies",

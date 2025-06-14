@@ -8,6 +8,8 @@ from .models import Message
 
 
 class MessageSerializer(ModelSerializer):
+    """Serializer for the Message model."""
+
     parent_message = SerializerMethodField(method_name="get_replies")
 
     def get_replies(self, instance):

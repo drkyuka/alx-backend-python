@@ -10,5 +10,10 @@ from . import views
 app_name = "messaging"
 
 urlpatterns = [
-    path("delete-user/", views.delete_user, name="delete_user"),
+    path("api/messaging/delete-user/", views.delete_user, name="delete_user"),
+    path(
+        "api/messaging/unread-messages/",
+        views.list_unread_messages,
+        name="list_unread_messages",
+    ),
 ]
