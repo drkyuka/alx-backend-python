@@ -3,23 +3,25 @@
 """
 
 from chats.models import User
-from messaging.models import Message
+from django.db import models
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
-    HTTP_401_UNAUTHORIZED,
     HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
     HTTP_404_NOT_FOUND,
 )
+
+from messaging.models import Message
 
 from .serializers import MessageSerializer
 
 
 @api_view(["DELETE"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def delete_user(request: Request) -> Response:
     """
     View to delete a user by ID.
@@ -27,20 +29,21 @@ def delete_user(request: Request) -> Response:
 
     try:
         user: User = request.user
+        username = user.username
         user.delete()
         return Response(
-            {"message": f"User {user.username} deleted successfully."},
+            {"message": f"User {username} deleted successfully."},
             status=HTTP_200_OK,
         )
-    except User.DoesNotExist:
+    except Exception as e:
         return Response(
-            {"error": f"User {user.username} not found."},
+            {"error": f"Error deleting user: {str(e)}"},
             status=HTTP_404_NOT_FOUND,
         )
 
 
 @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def list_unread_messages(request: Request) -> Response:
     """
     View to list unread messages for the authenticated user.
@@ -54,22 +57,23 @@ def list_unread_messages(request: Request) -> Response:
 
     user: User = request.user
 
-    # if not user.is_authenticated:
-    #     return Response(
-    #         {"error": "User is not authenticated."},
-    #         status=HTTP_401_UNAUTHORIZED,
-    #     )
+    if not user.is_authenticated:
+        return Response(
+            {"error": "User is not authenticated."},
+            status=HTTP_401_UNAUTHORIZED,
+        )
 
     # Fetch unread messages for the user
     unread_messages = Message.unread.filter(recipient=user).only(
         "message_id", "sender", "recipient", "content", "timestamp"
     )
 
-    return Response(unread_messages.data, status=HTTP_200_OK)
+    serializer = MessageSerializer(unread_messages, many=True)
+    return Response(serializer.data, status=HTTP_200_OK)
 
 
 @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def get_all_user_messages(request: Request) -> Response:
     """
     View to get all messages for the authenticated user.
@@ -83,19 +87,22 @@ def get_all_user_messages(request: Request) -> Response:
 
     user: User = request.user
 
-    # if not user.is_authenticated:
-    #     return Response(
-    #         {"error": "User is not authenticated."},
-    #         status=HTTP_401_UNAUTHORIZED,
-    #     )
+    if not user.is_authenticated:
+        return Response(
+            {"error": "User is not authenticated."},
+            status=HTTP_401_UNAUTHORIZED,
+        )
 
-    # Fetch all messages for the user
-    replies = MessageSerializer(Message.parent_message)
+    # Fetch all messages for the user (both sent and received)
+    all_messages = Message.objects.filter(
+        models.Q(sender=user) | models.Q(recipient=user)
+    ).order_by("-timestamp")
 
-    if not replies:
+    if not all_messages.exists():
         return Response(
             {"message": "No messages found for the user."},
             status=HTTP_404_NOT_FOUND,
         )
 
-    return Response(replies.data, status=HTTP_200_OK)
+    serializer = MessageSerializer(all_messages, many=True)
+    return Response(serializer.data, status=HTTP_200_OK)

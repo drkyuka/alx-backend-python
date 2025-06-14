@@ -22,7 +22,7 @@ class MessageSerializer(ModelSerializer):
             .order_by("-timestamp")
         )
 
-        return MessageSerializer(parent_message, many=True, context=self.context)
+        return MessageSerializer(parent_message, many=True, context=self.context).data
 
     class Meta:
         """Meta class for MessageSerializer."""
