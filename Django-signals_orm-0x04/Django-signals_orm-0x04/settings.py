@@ -69,9 +69,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "chats.middleware.RequestLoggingMiddleware",  # Custom middleware for logging requests
-    "chats.middleware.RestrictAccessByTimeMiddleware",  # Custom middleware to restrict access during certain hours
-    "chats.middleware.OffensiveLanguageMiddleware",  # Custom middleware to filter offensive language
-    "chats.middleware.RolepermissionMiddleware",  # Custom middleware grant access based on user roles
+    # "chats.middleware.RestrictAccessByTimeMiddleware",  # Custom middleware to restrict access during certain hours
+    # "chats.middleware.OffensiveLanguageMiddleware",  # Custom middleware to filter offensive language
+    # "chats.middleware.RolepermissionMiddleware",  # Custom middleware grant access based on user roles
 ]
 
 ROOT_URLCONF = "Django-signals_orm-0x04.urls"

@@ -6,10 +6,12 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
-django-filter = "*"
 djangorestframework-simplejwt = "*"
 pyjwt = "*"
 cryptography = "*"
+drf-nested-routers = "*"
+django-filter = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"

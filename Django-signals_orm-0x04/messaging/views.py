@@ -4,6 +4,7 @@
 
 from chats.models import User
 from django.db import models
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.cache import cache_page
 from rest_framework.permissions import IsAuthenticated
@@ -98,15 +99,17 @@ def get_all_user_messages(request: Request) -> Response:
         )
 
     # Fetch all messages for the user (both sent and received)
-    all_messages = Message.objects.filter(
-        models.Q(sender=user) | models.Q(recipient=user)
-    ).order_by("-timestamp")
+    replies = (
+        Message.objects.select_related("sender", "recipient")
+        .prefetch_related("parent_message")
+        .filter(Q(sender=request.user) | Q(recipient=user))
+    )
 
-    if not all_messages.exists():
+    if not replies.exists():
         return Response(
             {"message": "No messages found for the user."},
             status=HTTP_404_NOT_FOUND,
         )
 
-    serializer = MessageSerializer(all_messages, many=True)
+    serializer = MessageSerializer(replies, many=True)
     return Response(serializer.data, status=HTTP_200_OK)
