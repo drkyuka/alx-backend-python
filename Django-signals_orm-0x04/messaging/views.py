@@ -100,7 +100,8 @@ def get_all_user_messages(request: Request) -> Response:
 
     # Fetch all messages for the user (both sent and received)
     replies = (
-        Message.objects.select_related("sender", "recipient")
+        Message.objects.filter(user=user)
+        .select_related("sender", "recipient")
         .prefetch_related("parent_message")
         .filter(Q(sender=request.user) | Q(recipient=user))
     )
