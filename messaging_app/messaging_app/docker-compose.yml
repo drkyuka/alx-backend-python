@@ -17,7 +17,7 @@ services:
   web:
     build: .
     restart: always
-    command: sh -c "./entrypoint.sh"
+    command: sh -c "python3 manage.py runserver"
     ports:
       - "8000:8000"
     depends_on:
