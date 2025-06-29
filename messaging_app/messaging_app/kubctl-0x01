@@ -1,6 +1,6 @@
 #!/bin/bash
 # Use kubectl scale to increase the number of replicas to 3 of your Django app deployment.
-kubectl scale --replicas=3 deployment/messaging-app
+kubectl scale deployment/messaging-app --replicas=3 
 # Verify that multiple pods are running by using kubectl get pods.
 kubectl get pods
 # Perform load testing on your app using wrk to see how the scaled app handles traffic
