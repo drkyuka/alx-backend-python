@@ -5,12 +5,15 @@ pipeline {
     agent any
 
     stages {
+
+        // get credentials
         stage('Checkout') {
             steps {
                 git credentialsId: 'github-credentials', url: 'https://github.com/drkyuka/alx-backend-python.git'
             }
         }
 
+        // check credentials in the current branch
         stage('Check Credentials'){
             steps {
                 sh ''' 
@@ -19,6 +22,7 @@ pipeline {
             }
         }
 
+        // install dependencies
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -27,16 +31,47 @@ pipeline {
             }
         }
 
+        // run tests
         stage('Run Tests') {
             steps {
                 pipenv run pytest --junitxml=report.xml
             }
         }
 
+        // generate report
         stage('Publish Report') {
             steps {
                 junit 'report.xml'
             }
         }
+
+        // build messaging-app docker image
+        stage('Build Message App Docker Image') {
+            steps {
+                sh '''
+                    docker build -t messaging_app:1.0.0 .
+                '''
+            }
+        }
+
+        // push docker image to local docker Hub
+        stage('Push Docker Image') {
+            steps {
+                sh '''
+                    docker tag messaging_app:1.0.0 drkingkyavoni/messaging_app:1.0.0
+                    docker push drkingkyavoni/messaging_app:1.0.0
+                '''
+            }
+        }
+    }
+}
+
+post {
+
+    // clean up docker images
+    always {
+        sh '''
+            docker image prune -f
+        '''
     }
 }
