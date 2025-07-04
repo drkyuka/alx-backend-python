@@ -7,27 +7,30 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-credentials', url: 'https://github.com/drkyuka/alx-backend-python/tree/main/messaging_app/messaging_app'
+                git credentialsId: 'github-credentials', url: 'https://github.com/drkyuka/alx-backend-python.git'
+            }
+        }
+
+        stage('Check Credentials'){
+            steps {
+                sh ''' 
+                    git branch --show-current
+                '''
             }
         }
 
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    pipenv install --upgrade pipenv
-                    pipenv install --dev
-                    pipenv run pip3 install -r requirements.txt
+                    pipenv run pip3 install -r messaging_app/requirements.txt
                 '''
-                script {
-                    env.REPORT_FILE = "report-${env.BUILD_NUMBER}.xml"
-                    sh "pytest --junitxml=${env.REPORT_FILE}"
-                }
+            }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest --junitxml=report.xml'
-                junit "${env.REPORT_FILE}"
+                pipenv run pytest --junitxml=report.xml
+            }
         }
 
         stage('Publish Report') {
