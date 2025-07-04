@@ -1,0 +1,39 @@
+// Create a Jenkinsfile pipeline script that pulls the messaging app’s code from GitHub, installs dependencies, runs tests using pytest, and generates a report
+
+// Ensure to add Credentials for GitHub
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git credentialsId: 'github-credentials', url: 'https://github.com/drkyuka/alx-backend-python/tree/main/messaging_app/messaging_app'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    pipenv install --upgrade pipenv
+                    pipenv install --dev
+                    pipenv run pip install -r requirements.txt
+                '''
+                script {
+                    env.REPORT_FILE = "report-${env.BUILD_NUMBER}.xml"
+                    sh "pytest --junitxml=${env.REPORT_FILE}"
+                }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'pytest --junitxml=report.xml'
+                junit "${env.REPORT_FILE}"
+        }
+
+        stage('Publish Report') {
+            steps {
+                junit 'report.xml'
+            }
+        }
+    }
+}
