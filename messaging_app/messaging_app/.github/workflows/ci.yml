@@ -2,6 +2,12 @@
 
 # Ensure the workflow installs necessary dependencies and sets up a MySQL database for running tests
 
+# include a flake8 check for linting the Django project.
+
+# Fail the build if any linting errors are detected.
+
+# Add a step to generate code coverage reports and upload them as build artifacts
+
 name: Django Tests
 on:
   push:
@@ -38,7 +44,7 @@ jobs:
       - name: install dependencies using pipenv
         run: |
           sudo apt-get update
-          sudo apt-get install -y pipenv
+          sudo apt-get install -y pipenv flake8
           pipenv install -r requirements.txt
 
       - name: run django migrations
@@ -49,3 +55,17 @@ jobs:
       - name: run tests
         run: |
           pipenv run python manage.py test --settings=messaging_app.settings.test
+
+      - name: run flake8
+        run: |
+          pipenv run flake8 .
+
+      - name: generate coverage report
+        run: |
+          pipenv run coverage run --source='.' manage.py test
+          pipenv run coverage xml -o coverage.xml
+
+      - name: upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
