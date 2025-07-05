@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",  # djangorestframework
     "rest_framework.authtoken",  # djangorestframework.authtoken
     "rest_framework_simplejwt",  # djangorestframework_simplejwt
-    "chats.apps.ChatsConfig",
+    # "chats.apps.ChatsConfig",
 ]
 
 REST_FRAMEWORK = {
